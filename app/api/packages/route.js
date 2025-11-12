@@ -1,0 +1,32 @@
+import { NextResponse } from 'next/server'
+import connectDB from '@/lib/mongoose'
+import Package from '@/models/Package'
+
+// GET all packages
+export async function GET() {
+  try {
+    await connectDB()
+    const packages = await Package.find({}).sort({ createdAt: -1 })
+    return NextResponse.json({ success: true, data: packages })
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+// POST new package
+export async function POST(request) {
+  try {
+    await connectDB()
+    const body = await request.json()
+    const packageData = await Package.create(body)
+    return NextResponse.json({ success: true, data: packageData }, { status: 201 })
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 400 }
+    )
+  }
+}
