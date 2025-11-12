@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
+import { gamesAPI, packagesAPI, ordersAPI } from '@/lib/api'
 import { defaultGames, defaultPackages } from './data/defaultData'
 
 export default function HomePage() {
@@ -27,43 +28,53 @@ export default function HomePage() {
   const [userName, setUserName] = useState('')
   const [userRole, setUserRole] = useState('')
   const [userEmail, setUserEmail] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check login status
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true'
-    const name = localStorage.getItem('userName') || ''
-    const role = localStorage.getItem('userRole') || ''
-    const email = localStorage.getItem('userEmail') || ''
-    const banner = localStorage.getItem('headerBanner') || ''
-    
-    setIsLoggedIn(loggedIn)
-    setUserName(name)
-    setUserRole(role)
-    setUserEmail(email)
-    setBannerImage(banner)
-    
-    // Load games from localStorage or use default data
-    const savedGames = localStorage.getItem('games')
-    if (savedGames) {
-      const parsedGames = JSON.parse(savedGames).filter(g => g.status === 'active')
-      setGames(parsedGames.length > 0 ? parsedGames : defaultGames)
-    } else {
-      // Initialize with default games for first time
-      localStorage.setItem('games', JSON.stringify(defaultGames))
-      setGames(defaultGames)
-    }
-    
-    // Load packages from localStorage or use default data
-    const savedPackages = localStorage.getItem('packages')
-    if (savedPackages) {
-      const parsedPackages = JSON.parse(savedPackages).filter(p => p.status === 'active')
-      setPackages(parsedPackages.length > 0 ? parsedPackages : defaultPackages)
-    } else {
-      // Initialize with default packages for first time
-      localStorage.setItem('packages', JSON.stringify(defaultPackages))
-      setPackages(defaultPackages)
-    }
+    loadData()
   }, [])
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      // Check login status
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true'
+      const name = localStorage.getItem('userName') || ''
+      const role = localStorage.getItem('userRole') || ''
+      const email = localStorage.getItem('userEmail') || ''
+      const banner = localStorage.getItem('headerBanner') || ''
+      
+      setIsLoggedIn(loggedIn)
+      setUserName(name)
+      setUserRole(role)
+      setUserEmail(email)
+      setBannerImage(banner)
+      
+      // Load games from MongoDB
+      try {
+        const gamesResponse = await gamesAPI.getAll()
+        const activeGames = (gamesResponse.data || []).filter(g => g.status === 'active')
+        setGames(activeGames.length > 0 ? activeGames : defaultGames)
+      } catch (error) {
+        console.error('Error loading games:', error)
+        setGames(defaultGames)
+      }
+      
+      // Load packages from MongoDB
+      try {
+        const packagesResponse = await packagesAPI.getAll()
+        const activePackages = (packagesResponse.data || []).filter(p => p.status === 'active')
+        setPackages(activePackages.length > 0 ? activePackages : defaultPackages)
+      } catch (error) {
+        console.error('Error loading packages:', error)
+        setPackages(defaultPackages)
+      }
+    } catch (error) {
+      console.error('Error loading data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleTopUpClick = (game) => {
     setSelectedGame(game)
