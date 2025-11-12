@@ -1,16 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { defaultPackages } from '../../data/defaultData'
+import { packagesAPI, gamesAPI } from '@/lib/api'
 
 export default function AdminPackagesPage() {
   const [packages, setPackages] = useState([])
+  const [games, setGames] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingPackage, setEditingPackage] = useState(null)
   const [selectedGameFilter, setSelectedGameFilter] = useState('all')
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    game: '',
-    name: '',
+    gameId: '',
+    gameName: '',
+    amount: '',
     price: '',
     image: '',
     popular: false,
@@ -19,23 +22,34 @@ export default function AdminPackagesPage() {
 
   useEffect(() => {
     loadPackages()
+    loadGames()
   }, [])
 
-  const loadPackages = () => {
-    const savedPackages = localStorage.getItem('packages')
-    if (savedPackages) {
-      const parsedPackages = JSON.parse(savedPackages)
-      setPackages(parsedPackages.length > 0 ? parsedPackages : defaultPackages)
-    } else {
-      // Initialize with default packages
-      localStorage.setItem('packages', JSON.stringify(defaultPackages))
-      setPackages(defaultPackages)
+  const loadGames = async () => {
+    try {
+      const response = await gamesAPI.getAll()
+      setGames(response.data || [])
+    } catch (error) {
+      console.error('Error loading games:', error)
+    }
+  }
+
+  const loadPackages = async () => {
+    try {
+      setLoading(true)
+      const response = await packagesAPI.getAll()
+      setPackages(response.data || [])
+    } catch (error) {
+      console.error('Error loading packages:', error)
+      alert('Failed to load packages: ' + error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleAdd = () => {
     setEditingPackage(null)
-    setFormData({ game: '', name: '', price: '', image: '', popular: false, status: 'active' })
+    setFormData({ gameId: '', gameName: '', amount: '', price: '', image: '', popular: false, status: 'active' })
     setShowModal(true)
   }
 
@@ -45,55 +59,65 @@ export default function AdminPackagesPage() {
     setShowModal(true)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this package?')) {
-      const updatedPackages = packages.filter(p => p.id !== id)
-      setPackages(updatedPackages)
-      localStorage.setItem('packages', JSON.stringify(updatedPackages))
-      alert('Package deleted successfully!')
+      try {
+        setLoading(true)
+        await packagesAPI.delete(id)
+        alert('Package deleted successfully!')
+        loadPackages()
+      } catch (error) {
+        console.error('Error deleting package:', error)
+        alert('Failed to delete package: ' + error.message)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (editingPackage) {
-      const updatedPackages = packages.map(p => 
-        p.id === editingPackage.id ? { ...formData, id: editingPackage.id } : p
-      )
-      setPackages(updatedPackages)
-      localStorage.setItem('packages', JSON.stringify(updatedPackages))
-      alert('Package updated successfully!')
-    } else {
-      const newPackage = { ...formData, id: Date.now() }
-      const updatedPackages = [...packages, newPackage]
-      setPackages(updatedPackages)
-      localStorage.setItem('packages', JSON.stringify(updatedPackages))
-      alert('Package added successfully!')
+    try {
+      setLoading(true)
+      if (editingPackage) {
+        await packagesAPI.update(editingPackage._id, formData)
+        alert('Package updated successfully!')
+      } else {
+        await packagesAPI.create(formData)
+        alert('Package added successfully!')
+      }
+      setShowModal(false)
+      loadPackages()
+    } catch (error) {
+      console.error('Error saving package:', error)
+      alert('Failed to save package: ' + error.message)
+    } finally {
+      setLoading(false)
     }
-    
-    setShowModal(false)
   }
 
   const groupedPackages = packages.reduce((acc, pkg) => {
-    if (!acc[pkg.game]) acc[pkg.game] = []
-    acc[pkg.game].push(pkg)
+    const gameName = pkg.gameName || pkg.game
+    if (!acc[gameName]) acc[gameName] = []
+    acc[gameName].push(pkg)
     return acc
   }, {})
 
   // Filter packages based on selected game
   const filteredPackages = selectedGameFilter === 'all' 
     ? packages 
-    : packages.filter(pkg => pkg.game === selectedGameFilter)
+    : packages.filter(pkg => (pkg.gameName || pkg.game) === selectedGameFilter)
 
   const filteredGroupedPackages = filteredPackages.reduce((acc, pkg) => {
-    if (!acc[pkg.game]) acc[pkg.game] = []
-    acc[pkg.game].push(pkg)
+    const gameName = pkg.gameName || pkg.game
+    if (!acc[gameName]) acc[gameName] = []
+    acc[gameName].push(pkg)
     return acc
   }, {})
 
   // Get unique games for filter
-  const uniqueGames = [...new Set(packages.map(pkg => pkg.game))]
+  const uniqueGames = [...new Set(packages.map(pkg => pkg.gameName || pkg.game))]
 
   return (
     <div className="text-white flex gap-6">
@@ -128,7 +152,7 @@ export default function AdminPackagesPage() {
                   : 'bg-gray-700 hover:bg-gray-600'
               }`}
             >
-              {game} ({packages.filter(p => p.game === game).length})
+              {game} ({packages.filter(p => (p.gameName || p.game) === game).length})
             </button>
           ))}
         </div>
@@ -148,7 +172,7 @@ export default function AdminPackagesPage() {
             <h2 className="text-2xl font-bold mb-4 text-yellow-400">{game}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {pkgs.map((pkg) => (
-                <div key={pkg.id} className={`bg-gray-800 border-2 ${pkg.popular ? 'border-yellow-500' : 'border-gray-700'} rounded-lg p-6 relative`}>
+                <div key={pkg._id || pkg.id} className={`bg-gray-800 border-2 ${pkg.popular ? 'border-yellow-500' : 'border-gray-700'} rounded-lg p-6 relative`}>
                   {pkg.popular && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full">
                       POPULAR
@@ -160,7 +184,7 @@ export default function AdminPackagesPage() {
                       <div className="mb-3">
                         <img 
                           src={pkg.image} 
-                          alt={pkg.name}
+                          alt={pkg.amount || pkg.name}
                           className="w-24 h-24 mx-auto object-contain rounded-lg"
                           onError={(e) => {
                             e.target.style.display = 'none'
@@ -172,7 +196,7 @@ export default function AdminPackagesPage() {
                     ) : (
                       <div className="text-4xl mb-2">💎</div>
                     )}
-                    <h3 className="text-xl font-bold mb-1">{pkg.name}</h3>
+                    <h3 className="text-xl font-bold mb-1">{pkg.amount || pkg.name}</h3>
                     <p className="text-2xl font-bold text-yellow-400 mt-2">{pkg.price}</p>
                   </div>
 
@@ -188,12 +212,14 @@ export default function AdminPackagesPage() {
                     <button
                       onClick={() => handleEdit(pkg)}
                       className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition"
+                      disabled={loading}
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(pkg.id)}
+                      onClick={() => handleDelete(pkg._id || pkg.id)}
                       className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-sm transition"
+                      disabled={loading}
                     >
                       Delete
                     </button>
@@ -219,24 +245,31 @@ export default function AdminPackagesPage() {
                 <div>
                   <label className="block text-sm font-medium mb-1">Game *</label>
                   <select
-                    value={formData.game}
-                    onChange={(e) => setFormData({...formData, game: e.target.value})}
+                    value={formData.gameId}
+                    onChange={(e) => {
+                      const selected = games.find(g => g._id === e.target.value)
+                      setFormData({
+                        ...formData, 
+                        gameId: e.target.value,
+                        gameName: selected ? selected.name : ''
+                      })
+                    }}
                     className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600"
                     required
                   >
                     <option value="">Select Game</option>
-                    <option value="Free Fire">Free Fire</option>
-                    <option value="PUBG Mobile">PUBG Mobile</option>
-                    <option value="Mobile Legends">Mobile Legends</option>
+                    {games.map(game => (
+                      <option key={game._id} value={game._id}>{game.name}</option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Package Name *</label>
+                  <label className="block text-sm font-medium mb-1">Package Amount *</label>
                   <input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    value={formData.amount}
+                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
                     className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600"
                     placeholder="e.g., 310 Diamonds"
                     required

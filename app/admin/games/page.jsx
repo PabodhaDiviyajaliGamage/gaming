@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { defaultGames } from '../../data/defaultData'
+import { gamesAPI } from '@/lib/api'
 
 export default function AdminGamesPage() {
   const [games, setGames] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingGame, setEditingGame] = useState(null)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     image: '',
@@ -19,15 +20,16 @@ export default function AdminGamesPage() {
     loadGames()
   }, [])
 
-  const loadGames = () => {
-    const savedGames = localStorage.getItem('games')
-    if (savedGames) {
-      const parsedGames = JSON.parse(savedGames)
-      setGames(parsedGames.length > 0 ? parsedGames : defaultGames)
-    } else {
-      // Initialize with default games
-      localStorage.setItem('games', JSON.stringify(defaultGames))
-      setGames(defaultGames)
+  const loadGames = async () => {
+    try {
+      setLoading(true)
+      const response = await gamesAPI.getAll()
+      setGames(response.data || [])
+    } catch (error) {
+      console.error('Error loading games:', error)
+      alert('Failed to load games: ' + error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -43,34 +45,42 @@ export default function AdminGamesPage() {
     setShowModal(true)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this game?')) {
-      const updatedGames = games.filter(g => g.id !== id)
-      setGames(updatedGames)
-      localStorage.setItem('games', JSON.stringify(updatedGames))
-      alert('Game deleted successfully!')
+      try {
+        setLoading(true)
+        await gamesAPI.delete(id)
+        alert('Game deleted successfully!')
+        loadGames()
+      } catch (error) {
+        console.error('Error deleting game:', error)
+        alert('Failed to delete game: ' + error.message)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (editingGame) {
-      const updatedGames = games.map(g => 
-        g.id === editingGame.id ? { ...formData, id: editingGame.id } : g
-      )
-      setGames(updatedGames)
-      localStorage.setItem('games', JSON.stringify(updatedGames))
-      alert('Game updated successfully!')
-    } else {
-      const newGame = { ...formData, id: Date.now() }
-      const updatedGames = [...games, newGame]
-      setGames(updatedGames)
-      localStorage.setItem('games', JSON.stringify(updatedGames))
-      alert('Game added successfully!')
+    try {
+      setLoading(true)
+      if (editingGame) {
+        await gamesAPI.update(editingGame._id, formData)
+        alert('Game updated successfully!')
+      } else {
+        await gamesAPI.create(formData)
+        alert('Game added successfully!')
+      }
+      setShowModal(false)
+      loadGames()
+    } catch (error) {
+      console.error('Error saving game:', error)
+      alert('Failed to save game: ' + error.message)
+    } finally {
+      setLoading(false)
     }
-    
-    setShowModal(false)
   }
 
   return (
@@ -92,7 +102,7 @@ export default function AdminGamesPage() {
           </div>
         ) : (
           games.map((game) => (
-            <div key={game.id} className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition">
+            <div key={game._id || game.id} className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition">
               <div className="text-center">
                 {game.image ? (
                   <img 
@@ -122,12 +132,14 @@ export default function AdminGamesPage() {
                   <button
                     onClick={() => handleEdit(game)}
                     className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+                    disabled={loading}
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(game.id)}
+                    onClick={() => handleDelete(game._id || game.id)}
                     className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
+                    disabled={loading}
                   >
                     Delete
                   </button>
