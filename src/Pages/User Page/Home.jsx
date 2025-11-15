@@ -14,7 +14,7 @@ const Home = () => {
           <img
             src={bannerImage}
             alt="SL Gaming Hub Banner"
-            className="w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] object-cover pt-4 sm:pt-6 md:pt-8 lg:pt-10 px-2 sm:px-4 md:px-8 lg:px-70"
+            className="w-full h-[250px] sm:h-[350px] md:h-[550px] lg:h-[650px] object-cover pt-4 sm:pt-6 md:pt-8 lg:pt-10 px-2 sm:px-4 md:px-8 lg:px-70"
           />
       </div>
 
