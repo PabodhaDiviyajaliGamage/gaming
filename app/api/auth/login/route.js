@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongoose'
 import User from '@/models/User'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'slgaminghub-secret-key-2025'
 
@@ -28,8 +29,36 @@ export async function POST(request) {
       )
     }
     
-    // Check password using bcrypt
-    const isPasswordValid = await user.comparePassword(password)
+    let isPasswordValid = false
+    
+    // Try bcrypt comparison first
+    try {
+      if (user.comparePassword) {
+        isPasswordValid = await user.comparePassword(password)
+      } else {
+        // Fallback: manual bcrypt compare
+        isPasswordValid = await bcrypt.compare(password, user.password)
+      }
+    } catch (bcryptError) {
+      // If bcrypt fails, it might be a plain text password (legacy users)
+      // Check if password matches directly (for migration period)
+      if (user.password === password) {
+        isPasswordValid = true
+        
+        // Auto-migrate: hash the password for next time
+        try {
+          const salt = await bcrypt.genSalt(10)
+          const hashedPassword = await bcrypt.hash(password, salt)
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { password: hashedPassword } }
+          )
+          console.log('Auto-migrated plain text password to bcrypt for user:', user.email)
+        } catch (migrationError) {
+          console.error('Failed to auto-migrate password:', migrationError)
+        }
+      }
+    }
     
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -80,7 +109,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Internal server error: ' + error.message },
       { status: 500 }
     )
   }
