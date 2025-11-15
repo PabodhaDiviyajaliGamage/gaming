@@ -321,7 +321,7 @@ export default function HomePage() {
       {/* Banner Section */}
       <div className="w-full overflow-hidden">
         {bannerImage ? (
-          <div className="w-full h-[250px] sm:h-[350px] md:h-[450px] relative">
+          <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] relative">
             <img 
               src={bannerImage} 
               alt="Header Banner" 
@@ -329,8 +329,8 @@ export default function HomePage() {
             />
           </div>
         ) : (
-          <div className="w-full h-[250px] sm:h-[350px] md:h-[450px] bg-gradient-to-r from-purple-900 to-blue-900 flex items-center justify-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-center">Welcome to SL Gaming Hub</h1>
+          <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] bg-gradient-to-r from-purple-900 to-blue-900 flex items-center justify-center">
+            <h1 className="text-3xl md:text-5xl font-bold text-center">Welcome to SL Gaming Hub</h1>
           </div>
         )}
       </div>
