@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usersAPI } from '@/lib/api'
 
 export default function RegisterForm({ onClose, onShowLogin }) {
   const [showPassword, setShowPassword] = useState(false)
@@ -53,56 +54,47 @@ export default function RegisterForm({ onClose, onShowLogin }) {
     setLoading(true)
     setError('')
 
-    // Simulate registration (replace with real API later)
-    setTimeout(() => {
-      // Mock registration - save to localStorage for demo
-      const users = JSON.parse(localStorage.getItem('users') || '[]')
-      
-      // Check if user already exists
-      const existingUser = users.find(u => u.email === formData.email)
-      if (existingUser) {
-        setError('User with this email already exists!')
-        setLoading(false)
-        return
-      }
-
-      // Add new user
-      users.push({
-        id: Date.now(),
+    try {
+      // Register user via API
+      const result = await usersAPI.register({
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         phone: formData.phone,
-        password: formData.password, // In real app, this should be hashed!
-        role: 'user',
-        createdAt: new Date().toISOString()
+        password: formData.password,
+        role: 'user'
       })
 
-      localStorage.setItem('users', JSON.stringify(users))
-      
-      setSuccess(true)
-      alert('Registration successful! You can now login with your credentials.')
-      
-      // Reset form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        phone: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-      })
+      if (result.success) {
+        setSuccess(true)
+        alert('Registration successful! You can now login with your credentials.')
+        
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          phone: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+        })
 
-      // Show login form after 2 seconds
-      setTimeout(() => {
-        if (onShowLogin) {
-          onShowLogin()
-        } else {
-          window.location.href = '/'
-        }
-      }, 2000)
-
+        // Show login form after 2 seconds
+        setTimeout(() => {
+          if (onShowLogin) {
+            onShowLogin()
+          } else {
+            window.location.href = '/'
+          }
+        }, 2000)
+      } else {
+        setError(result.error || 'Registration failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('Registration error:', error)
+      setError('Registration failed. Please try again.')
+    } finally {
       setLoading(false)
-    }, 1500)
+    }
   }
 
   if (success) {

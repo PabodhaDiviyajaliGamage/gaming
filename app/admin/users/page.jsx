@@ -1,15 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usersAPI } from '@/lib/api'
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    password: '',
     role: 'user',
     status: 'active'
   })
@@ -18,64 +21,88 @@ export default function AdminUsersPage() {
     loadUsers()
   }, [])
 
-  const loadUsers = () => {
-    const savedUsers = localStorage.getItem('adminUsers')
-    if (savedUsers) {
-      setUsers(JSON.parse(savedUsers))
-    } else {
-      const sampleUsers = [
-        { id: 1, name: 'Admin User', email: 'admin@mail.com', phone: '0771234567', role: 'admin', status: 'active', createdAt: '2024-01-01' },
-        { id: 2, name: 'Regular User', email: 'user@mail.com', phone: '0779876543', role: 'user', status: 'active', createdAt: '2024-01-02' }
-      ]
-      localStorage.setItem('adminUsers', JSON.stringify(sampleUsers))
-      setUsers(sampleUsers)
+  const loadUsers = async () => {
+    try {
+      setLoading(true)
+      const response = await usersAPI.getAll()
+      if (response.success) {
+        setUsers(response.data || [])
+      } else {
+        console.error('Failed to load users:', response.error)
+      }
+    } catch (error) {
+      console.error('Error loading users:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleAdd = () => {
     setEditingUser(null)
-    setFormData({ name: '', email: '', phone: '', role: 'user', status: 'active' })
+    setFormData({ name: '', email: '', phone: '', password: '', role: 'user', status: 'active' })
     setShowModal(true)
   }
 
   const handleEdit = (user) => {
     setEditingUser(user)
-    setFormData(user)
+    setFormData({ ...user, password: '' })
     setShowModal(true)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this user?')) {
-      const updatedUsers = users.filter(u => u.id !== id)
-      setUsers(updatedUsers)
-      localStorage.setItem('adminUsers', JSON.stringify(updatedUsers))
-      alert('User deleted successfully!')
+      try {
+        const result = await usersAPI.delete(id)
+        if (result.success) {
+          setUsers(users.filter(u => (u._id || u.id) !== id))
+          alert('User deleted successfully!')
+        } else {
+          alert('Failed to delete user')
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error)
+        alert('Failed to delete user')
+      }
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (editingUser) {
-      const updatedUsers = users.map(u => 
-        u.id === editingUser.id ? { ...formData, id: editingUser.id, createdAt: editingUser.createdAt } : u
-      )
-      setUsers(updatedUsers)
-      localStorage.setItem('adminUsers', JSON.stringify(updatedUsers))
-      alert('User updated successfully!')
-    } else {
-      const newUser = { 
-        ...formData, 
-        id: Date.now(),
-        createdAt: new Date().toISOString().split('T')[0]
+    try {
+      if (editingUser) {
+        const updateData = { ...formData }
+        if (!updateData.password) {
+          delete updateData.password
+        }
+        const result = await usersAPI.update(editingUser._id || editingUser.id, updateData)
+        if (result.success) {
+          setUsers(users.map(u => 
+            (u._id || u.id) === (editingUser._id || editingUser.id) ? result.data : u
+          ))
+          alert('User updated successfully!')
+        } else {
+          alert('Failed to update user')
+        }
+      } else {
+        if (!formData.password) {
+          alert('Password is required for new users')
+          return
+        }
+        const result = await usersAPI.register(formData)
+        if (result.success) {
+          setUsers([...users, result.data])
+          alert('User added successfully!')
+        } else {
+          alert(result.error || 'Failed to add user')
+        }
       }
-      const updatedUsers = [...users, newUser]
-      setUsers(updatedUsers)
-      localStorage.setItem('adminUsers', JSON.stringify(updatedUsers))
-      alert('User added successfully!')
+      
+      setShowModal(false)
+    } catch (error) {
+      console.error('Error saving user:', error)
+      alert('Failed to save user')
     }
-    
-    setShowModal(false)
   }
 
   return (
@@ -105,7 +132,13 @@ export default function AdminUsersPage() {
               </tr>
             </thead>
             <tbody>
-              {users.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="px-4 py-8 text-center text-gray-400">
+                    Loading users...
+                  </td>
+                </tr>
+              ) : users.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-4 py-8 text-center text-gray-400">
                     No users found. Click "Add New User" to create one.
@@ -113,7 +146,7 @@ export default function AdminUsersPage() {
                 </tr>
               ) : (
                 users.map((user) => (
-                  <tr key={user.id} className="border-t border-gray-700 hover:bg-gray-750">
+                  <tr key={user._id || user.id} className="border-t border-gray-700 hover:bg-gray-750">
                     <td className="px-4 py-3 font-semibold">{user.name}</td>
                     <td className="px-4 py-3">{user.email}</td>
                     <td className="px-4 py-3">{user.phone}</td>
@@ -131,7 +164,9 @@ export default function AdminUsersPage() {
                         {user.status.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-400">{user.createdAt}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                    </td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleEdit(user)}
@@ -140,7 +175,7 @@ export default function AdminUsersPage() {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDelete(user._id || user.id)}
                         className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition"
                       >
                         Delete
@@ -194,6 +229,20 @@ export default function AdminUsersPage() {
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600"
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Password {editingUser ? '(leave blank to keep current)' : '*'}
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600"
+                    required={!editingUser}
+                    placeholder={editingUser ? 'Leave blank to keep current password' : 'Enter password'}
                   />
                 </div>
 

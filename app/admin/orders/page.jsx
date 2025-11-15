@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { ordersAPI } from '@/lib/api'
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([])
@@ -8,55 +9,37 @@ export default function AdminOrdersPage() {
   const [showSlipModal, setShowSlipModal] = useState(false)
   const [selectedOrderSlip, setSelectedOrderSlip] = useState(null)
   const [editingOrder, setEditingOrder] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
     orderNumber: '',
     customerName: '',
+    customerEmail: '',
     game: '',
     package: '',
     amount: '',
     status: 'pending',
     gameId: '',
-    phone: ''
+    playerNickname: '',
+    paymentMethod: 'bank'
   })
 
   useEffect(() => {
     loadOrders()
   }, [])
 
-  const loadOrders = () => {
-    const savedOrders = localStorage.getItem('orders')
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders))
-    } else {
-      // Sample data
-      const sampleOrders = [
-        {
-          id: 1,
-          orderNumber: 'ORD001',
-          customerName: 'John Doe',
-          game: 'Free Fire',
-          package: '310 Diamonds',
-          amount: 'LKR 500',
-          status: 'completed',
-          gameId: '123456789',
-          phone: '0771234567',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 2,
-          orderNumber: 'ORD002',
-          customerName: 'Jane Smith',
-          game: 'PUBG Mobile',
-          package: '325 UC',
-          amount: 'LKR 500',
-          status: 'pending',
-          gameId: '987654321',
-          phone: '0779876543',
-          createdAt: new Date().toISOString()
-        }
-      ]
-      localStorage.setItem('orders', JSON.stringify(sampleOrders))
-      setOrders(sampleOrders)
+  const loadOrders = async () => {
+    try {
+      setLoading(true)
+      const response = await ordersAPI.getAll()
+      if (response.success) {
+        setOrders(response.data || [])
+      } else {
+        console.error('Failed to load orders:', response.error)
+      }
+    } catch (error) {
+      console.error('Error loading orders:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -65,12 +48,14 @@ export default function AdminOrdersPage() {
     setFormData({
       orderNumber: `ORD${Date.now().toString().slice(-6)}`,
       customerName: '',
+      customerEmail: '',
       game: '',
       package: '',
       amount: '',
       status: 'pending',
       gameId: '',
-      phone: ''
+      playerNickname: '',
+      paymentMethod: 'bank'
     })
     setShowModal(true)
   }
@@ -86,40 +71,54 @@ export default function AdminOrdersPage() {
     setShowSlipModal(true)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this order?')) {
-      const updatedOrders = orders.filter(o => o.id !== id)
-      setOrders(updatedOrders)
-      localStorage.setItem('orders', JSON.stringify(updatedOrders))
-      alert('Order deleted successfully!')
+      try {
+        const result = await ordersAPI.delete(id)
+        if (result.success) {
+          setOrders(orders.filter(o => (o._id || o.id) !== id))
+          alert('Order deleted successfully!')
+        } else {
+          alert('Failed to delete order')
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error)
+        alert('Failed to delete order')
+      }
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (editingOrder) {
-      // Update existing order
-      const updatedOrders = orders.map(o => 
-        o.id === editingOrder.id ? { ...formData, id: editingOrder.id } : o
-      )
-      setOrders(updatedOrders)
-      localStorage.setItem('orders', JSON.stringify(updatedOrders))
-      alert('Order updated successfully!')
-    } else {
-      // Add new order
-      const newOrder = {
-        ...formData,
-        id: Date.now(),
-        createdAt: new Date().toISOString()
+    try {
+      if (editingOrder) {
+        // Update existing order
+        const result = await ordersAPI.update(editingOrder._id || editingOrder.id, formData)
+        if (result.success) {
+          setOrders(orders.map(o => 
+            (o._id || o.id) === (editingOrder._id || editingOrder.id) ? result.data : o
+          ))
+          alert('Order updated successfully!')
+        } else {
+          alert('Failed to update order')
+        }
+      } else {
+        // Add new order
+        const result = await ordersAPI.create(formData)
+        if (result.success) {
+          setOrders([...orders, result.data])
+          alert('Order added successfully!')
+        } else {
+          alert('Failed to add order')
+        }
       }
-      const updatedOrders = [...orders, newOrder]
-      setOrders(updatedOrders)
-      localStorage.setItem('orders', JSON.stringify(updatedOrders))
-      alert('Order added successfully!')
+      
+      setShowModal(false)
+    } catch (error) {
+      console.error('Error saving order:', error)
+      alert('Failed to save order')
     }
-    
-    setShowModal(false)
   }
 
   const getStatusColor = (status) => {
@@ -152,7 +151,13 @@ export default function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="px-4 py-8 text-center text-gray-400">
+                    Loading orders...
+                  </td>
+                </tr>
+              ) : orders.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-4 py-8 text-center text-gray-400">
                     No orders found. Click "Add New Order" to create one.
@@ -160,15 +165,15 @@ export default function AdminOrdersPage() {
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order.id} className="border-t border-gray-700 hover:bg-gray-750">
+                  <tr key={order._id || order.id} className="border-t border-gray-700 hover:bg-gray-750">
                     <td className="px-4 py-3">{order.orderNumber}</td>
                     <td className="px-4 py-3">
                       <div>{order.customerName}</div>
-                      <div className="text-xs text-gray-400">{order.phone}</div>
+                      <div className="text-xs text-gray-400">{order.customerEmail || order.phone}</div>
                     </td>
                     <td className="px-4 py-3">{order.game}</td>
                     <td className="px-4 py-3">{order.package}</td>
-                    <td className="px-4 py-3 font-semibold">{order.amount}</td>
+                    <td className="px-4 py-3 font-semibold">LKR {order.amount}</td>
                     <td className="px-4 py-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
                         {order.status.toUpperCase()}

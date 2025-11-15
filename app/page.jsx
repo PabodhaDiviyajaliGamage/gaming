@@ -114,7 +114,7 @@ export default function HomePage() {
     }
   }
 
-  const handleCheckoutSubmit = (e) => {
+  const handleCheckoutSubmit = async (e) => {
     e.preventDefault()
     
     if (!paymentMethod) {
@@ -134,25 +134,33 @@ export default function HomePage() {
 
     // Create order
     const order = {
-      id: Date.now(),
       orderNumber: 'ORD' + Date.now().toString().slice(-6),
       customerName: userName,
+      customerEmail: userEmail,
       game: selectedGame.name,
       package: selectedPackage.amount,
       quantity: quantity,
-      amount: `LKR ${totalAmount}`,
+      amount: totalAmount,
       status: 'pending',
       gameId: playerDetails.playerId,
       playerNickname: playerDetails.playerNickname,
       paymentMethod: paymentMethod,
-      paymentSlip: paymentSlip,
-      createdAt: new Date().toISOString()
+      paymentSlip: paymentSlip
     }
 
-    // Save to localStorage
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]')
-    existingOrders.push(order)
-    localStorage.setItem('orders', JSON.stringify(existingOrders))
+    // Save to MongoDB
+    try {
+      const result = await ordersAPI.create(order)
+      if (!result.success) {
+        alert('Failed to create order. Please try again.')
+        return
+      }
+      order.orderNumber = result.data.orderNumber
+    } catch (error) {
+      console.error('Error creating order:', error)
+      alert('Failed to create order. Please try again.')
+      return
+    }
 
     // Prepare email content
     const orderDetails = 
@@ -329,51 +337,87 @@ export default function HomePage() {
 
       {/* Games Section */}
       <div className="max-w-7xl mx-auto p-6">
-        <h2 className="text-3xl font-bold mb-6 text-center text-yellow-300">Featured Games</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.length === 0 ? (
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
+            Featured Games
+          </h2>
+          <p className="text-gray-400 text-lg">Choose your favorite game and top up now!</p>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {loading ? (
+            <div className="col-span-3 text-center text-gray-400 py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mb-4"></div>
+              <p className="text-xl">Loading games...</p>
+            </div>
+          ) : games.length === 0 ? (
             <div className="col-span-3 text-center text-gray-400 py-12">
               <p className="text-xl">No games available at the moment</p>
             </div>
           ) : (
             games.map((game) => {
               // Get packages for this game
-              const gamePackages = packages.filter(pkg => pkg.game === game.name).map(pkg => ({
-                id: pkg.id,
-                amount: pkg.name,
+              const gamePackages = packages.filter(pkg => (pkg.gameName || pkg.game) === game.name).map(pkg => ({
+                id: pkg._id || pkg.id,
+                amount: pkg.amount || pkg.name,
                 price: pkg.price,
                 popular: pkg.popular || false
               }))
               
               return (
-                <div key={game.id} className="bg-gray-800 rounded-lg p-6 text-center hover:shadow-xl transition">
-                  {game.image ? (
-                    <img 
-                      src={game.image} 
-                      alt={game.name}
-                      className="w-24 h-24 mx-auto mb-4 object-contain rounded-lg"
-                      onError={(e) => {
-                        e.target.style.display = 'none'
-                        e.target.nextElementSibling.style.display = 'block'
-                      }}
-                    />
-                  ) : null}
-                  <div className="text-6xl mb-4" style={{display: game.image ? 'none' : 'block'}}>🎮</div>
-                  <h3 className="text-xl font-bold mb-2">{game.name}</h3>
-                  <p className="text-gray-400 mb-4">{game.description}</p>
-                  <button 
-                    onClick={() => handleTopUpClick({ 
-                      name: game.name, 
-                      icon: game.image || '🎮',
-                      packages: gamePackages.length > 0 ? gamePackages : [
-                        { id: 1, amount: 'No packages available', price: 'N/A', popular: false }
-                      ]
-                    })}
-                    className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition"
-                    disabled={gamePackages.length === 0}
-                  >
-                    {gamePackages.length > 0 ? 'Top Up Now' : 'No Packages'}
-                  </button>
+                <div 
+                  key={game._id || game.id} 
+                  className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 text-center hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-300 transform hover:-translate-y-2 border border-gray-700 hover:border-yellow-500"
+                >
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-orange-500/0 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 rounded-2xl transition-all duration-300"></div>
+                  
+                  <div className="relative z-10">
+                    {game.image ? (
+                      <div className="mb-6 relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-2xl rounded-full group-hover:bg-yellow-500/40 transition-all duration-300"></div>
+                        <img 
+                          src={game.image} 
+                          alt={game.name}
+                          className="w-48 h-48 mx-auto object-contain rounded-xl transform group-hover:scale-110 transition-transform duration-300 relative z-10"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-48 h-48 mx-auto mb-6 bg-gray-700 rounded-xl flex items-center justify-center group-hover:bg-gray-600 transition-colors">
+                        <span className="text-gray-500 text-sm">No Image</span>
+                      </div>
+                    )}
+                    
+                    <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-yellow-400 transition-colors">
+                      {game.name}
+                    </h3>
+                    <p className="text-gray-400 mb-6 min-h-[3rem]">{game.description}</p>
+                    
+                    <button 
+                      onClick={() => handleTopUpClick({ 
+                        name: game.name, 
+                        image: game.image,
+                        packages: gamePackages.length > 0 ? gamePackages : [
+                          { id: 1, amount: 'No packages available', price: 'N/A', popular: false }
+                        ]
+                      })}
+                      className={`w-full px-6 py-3 font-bold rounded-xl transition-all duration-300 transform ${
+                        gamePackages.length > 0 
+                          ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black shadow-lg hover:shadow-yellow-500/50 group-hover:scale-105' 
+                          : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                      }`}
+                      disabled={gamePackages.length === 0}
+                    >
+                      {gamePackages.length > 0 ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span>Top Up Now</span>
+                          <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                        </span>
+                      ) : (
+                        'No Packages'
+                      )}
+                    </button>
+                  </div>
                 </div>
               )
             })
@@ -387,14 +431,16 @@ export default function HomePage() {
           <div className="bg-gray-900 rounded-xl shadow-2xl max-w-md w-full">
             <div className="bg-gray-800 p-6 border-b border-gray-700 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                {typeof selectedGame.icon === 'string' && selectedGame.icon.startsWith('data:image') ? (
+                {selectedGame.image ? (
                   <img 
-                    src={selectedGame.icon} 
+                    src={selectedGame.image} 
                     alt={selectedGame.name}
                     className="w-12 h-12 object-contain rounded"
                   />
                 ) : (
-                  <span className="text-4xl">{selectedGame.icon}</span>
+                  <div className="w-12 h-12 bg-gray-700 rounded flex items-center justify-center">
+                    <span className="text-gray-500 text-xs">No Image</span>
+                  </div>
                 )}
                 <div>
                   <h2 className="text-2xl font-bold text-white">{selectedGame.name}</h2>
@@ -475,14 +521,16 @@ export default function HomePage() {
           <div className="bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-gray-800 p-6 border-b border-gray-700 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                {typeof selectedGame.icon === 'string' && selectedGame.icon.startsWith('data:image') ? (
+                {selectedGame.image ? (
                   <img 
-                    src={selectedGame.icon} 
+                    src={selectedGame.image} 
                     alt={selectedGame.name}
                     className="w-16 h-16 object-contain rounded"
                   />
                 ) : (
-                  <span className="text-5xl">{selectedGame.icon}</span>
+                  <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center">
+                    <span className="text-gray-500 text-xs">No Image</span>
+                  </div>
                 )}
                 <div>
                   <h2 className="text-2xl font-bold text-white">{selectedGame.name}</h2>
@@ -501,7 +549,7 @@ export default function HomePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {selectedGame.packages.map((pkg) => {
                   // Find the package from packages array to get the image
-                  const packageData = packages.find(p => p.id === pkg.id)
+                  const packageData = packages.find(p => (p._id || p.id) === pkg.id)
                   const quantity = packageQuantities[pkg.id] || 1
                   
                   return (
@@ -519,14 +567,13 @@ export default function HomePage() {
                           <img 
                             src={packageData.image} 
                             alt={pkg.amount}
-                            className="w-16 h-16 mx-auto mb-3 object-contain rounded-lg"
-                            onError={(e) => {
-                              e.target.style.display = 'none'
-                              e.target.nextElementSibling.style.display = 'block'
-                            }}
+                            className="w-24 h-24 mx-auto mb-3 object-contain rounded-lg"
                           />
-                        ) : null}
-                        <div className="text-4xl mb-3" style={{display: packageData?.image ? 'none' : 'block'}}>💎</div>
+                        ) : (
+                          <div className="w-24 h-24 mx-auto mb-3 bg-gray-700 rounded-lg flex items-center justify-center">
+                            <span className="text-gray-500 text-xs">No Image</span>
+                          </div>
+                        )}
                         <h3 className="text-xl font-bold text-white mb-2">{pkg.amount}</h3>
                         <p className="text-2xl font-bold text-yellow-400 mb-3">{pkg.price}</p>
                         

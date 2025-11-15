@@ -6,7 +6,7 @@ import Package from '@/models/Package'
 export async function GET() {
   try {
     await connectDB()
-    const packages = await Package.find({}).sort({ createdAt: -1 })
+    const packages = await Package.find({}).sort({ createdAt: 1 })
     return NextResponse.json({ success: true, data: packages })
   } catch (error) {
     return NextResponse.json(

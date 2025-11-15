@@ -181,20 +181,15 @@ export default function AdminPackagesPage() {
                   
                   <div className="text-center mb-4">
                     {pkg.image ? (
-                      <div className="mb-3">
-                        <img 
-                          src={pkg.image} 
-                          alt={pkg.amount || pkg.name}
-                          className="w-24 h-24 mx-auto object-contain rounded-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none'
-                            e.target.nextElementSibling.style.display = 'block'
-                          }}
-                        />
-                        <div className="text-4xl mb-2" style={{display: 'none'}}>💎</div>
-                      </div>
+                      <img 
+                        src={pkg.image} 
+                        alt={pkg.amount || pkg.name}
+                        className="w-24 h-24 mx-auto mb-3 object-contain rounded-lg"
+                      />
                     ) : (
-                      <div className="text-4xl mb-2">💎</div>
+                      <div className="w-24 h-24 mx-auto mb-3 bg-gray-700 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-500 text-sm">No Image</span>
+                      </div>
                     )}
                     <h3 className="text-xl font-bold mb-1">{pkg.amount || pkg.name}</h3>
                     <p className="text-2xl font-bold text-yellow-400 mt-2">{pkg.price}</p>
@@ -289,7 +284,7 @@ export default function AdminPackagesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Package Image (Optional)</label>
+                  <label className="block text-sm font-medium mb-1">Package Image *</label>
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -304,6 +299,7 @@ export default function AdminPackagesPage() {
                       }
                     }}
                     className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600 text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                    required={!formData.image}
                   />
                   <p className="text-xs text-gray-400 mt-1">
                     Upload PNG, JPG, or WebP image (recommended: 256x256px)

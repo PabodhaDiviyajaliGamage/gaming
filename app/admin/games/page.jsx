@@ -12,7 +12,6 @@ export default function AdminGamesPage() {
     name: '',
     image: '',
     description: '',
-    category: '',
     status: 'active'
   })
 
@@ -35,7 +34,7 @@ export default function AdminGamesPage() {
 
   const handleAdd = () => {
     setEditingGame(null)
-    setFormData({ name: '', image: '', description: '', category: '', status: 'active' })
+    setFormData({ name: '', image: '', description: '', status: 'active' })
     setShowModal(true)
   }
 
@@ -109,18 +108,14 @@ export default function AdminGamesPage() {
                     src={game.image} 
                     alt={game.name}
                     className="w-24 h-24 mx-auto mb-3 object-contain rounded-lg"
-                    onError={(e) => {
-                      e.target.style.display = 'none'
-                      e.target.nextElementSibling.style.display = 'block'
-                    }}
                   />
-                ) : null}
-                <div className="text-6xl mb-3" style={{display: game.image ? 'none' : 'block'}}>🎮</div>
+                ) : (
+                  <div className="w-24 h-24 mx-auto mb-3 bg-gray-700 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">No Image</span>
+                  </div>
+                )}
                 <h3 className="text-xl font-bold mb-2">{game.name}</h3>
-                <p className="text-gray-400 mb-2">{game.description}</p>
-                <span className="inline-block px-3 py-1 bg-blue-600 rounded-full text-xs mb-3">
-                  {game.category}
-                </span>
+                <p className="text-gray-400 mb-4">{game.description}</p>
                 <div className="mb-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                     game.status === 'active' ? 'bg-green-500' : 'bg-red-500'
@@ -172,7 +167,7 @@ export default function AdminGamesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Game Image (Optional)</label>
+                  <label className="block text-sm font-medium mb-1">Game Image *</label>
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -187,6 +182,7 @@ export default function AdminGamesPage() {
                       }
                     }}
                     className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600 text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                    required={!formData.image}
                   />
                   <p className="text-xs text-gray-400 mt-1">
                     Upload PNG, JPG, or WebP image (recommended: 256x256px)
@@ -220,23 +216,6 @@ export default function AdminGamesPage() {
                     placeholder="e.g., Top up diamonds"
                     required
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Category *</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Battle Royale">Battle Royale</option>
-                    <option value="MOBA">MOBA</option>
-                    <option value="RPG">RPG</option>
-                    <option value="Strategy">Strategy</option>
-                    <option value="Action">Action</option>
-                  </select>
                 </div>
 
                 <div>
