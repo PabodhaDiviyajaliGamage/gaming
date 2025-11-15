@@ -186,7 +186,7 @@ const FreeFireSGTopUp = () => {
         ) : packageData.length === 0 ? (
           <div className="text-center bg-red-100 border border-red-400 text-red-700 px-4 py-8 rounded mb-4">
             <p className="text-xl font-bold mb-2">No packages found</p>
-            <p>Sorry, we couldn't find any packages for this game. Please try again later or contact support.</p>
+            <p>Sorry, we couldn&apos;t find any packages for this game. Please try again later or contact support.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

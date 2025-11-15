@@ -164,7 +164,7 @@ export default function AdminPackagesPage() {
 
         {Object.keys(filteredGroupedPackages).length === 0 ? (
           <div className="bg-gray-800 rounded-lg p-8 text-center text-gray-400">
-            No packages found. Click "Add New Package" to create one.
+            No packages found. Click &quot;Add New Package&quot; to create one.
           </div>
         ) : (
           Object.entries(filteredGroupedPackages).map(([game, pkgs]) => (

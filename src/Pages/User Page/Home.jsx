@@ -40,7 +40,7 @@ const Home = () => {
               <div className="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
                 <p className="text-xl font-semibold mb-2">6:00 AM - 10:00 PM</p>
                 <p className="text-sm text-blue-200">
-                  We're open every day including weekends and holidays.
+                  We&apos;re open every day including weekends and holidays.
                   <br />
                   Orders placed outside store hours will be processed the next day.
                 </p>

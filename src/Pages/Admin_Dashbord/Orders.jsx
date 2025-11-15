@@ -408,7 +408,7 @@ const Orders = () => {
                     <ul className="text-xs ml-4">
                       {order.emailsSent.slice(0, 2).map((email, i) => (
                         <li key={i} className="italic">
-                          {new Date(email.timestamp).toLocaleString()}: "{email.subject}"
+                          {new Date(email.timestamp).toLocaleString()}: &quot;{email.subject}&quot;
                         </li>
                       ))}
                       {order.emailsSent.length > 2 && <li>...</li>}

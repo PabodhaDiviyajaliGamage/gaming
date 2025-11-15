@@ -160,7 +160,7 @@ export default function AdminOrdersPage() {
               ) : orders.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-4 py-8 text-center text-gray-400">
-                    No orders found. Click "Add New Order" to create one.
+                    No orders found. Click &quot;Add New Order&quot; to create one.
                   </td>
                 </tr>
               ) : (

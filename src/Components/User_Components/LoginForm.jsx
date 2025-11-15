@@ -279,7 +279,7 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
           Forgot password?
         </Link>
         <div className="text-gray-400 text-sm">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link to="/auth/register" className="text-blue-400 hover:underline">
             Register
           </Link>

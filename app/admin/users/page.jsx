@@ -141,7 +141,7 @@ export default function AdminUsersPage() {
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-4 py-8 text-center text-gray-400">
-                    No users found. Click "Add New User" to create one.
+                    No users found. Click &quot;Add New User&quot; to create one.
                   </td>
                 </tr>
               ) : (

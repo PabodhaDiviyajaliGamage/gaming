@@ -124,7 +124,7 @@ export default function AdminBankDetailsPage() {
 
       {Object.keys(groupedBanks).length === 0 ? (
         <div className="bg-gray-800 rounded-lg p-8 text-center text-gray-400">
-          No bank details found. Click "Add Bank Detail" to create one.
+          No bank details found. Click &quot;Add Bank Detail&quot; to create one.
         </div>
       ) : (
         <>

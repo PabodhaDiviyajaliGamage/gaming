@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Footer from "../../Components/User_Components/Footer";
 import PaymentMethod from "../../Components/User_Components/PaymentMethod";
@@ -15,6 +15,32 @@ const GamePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const gameId = useParams().gameId;
   const navigate = useNavigate();
+
+  // Function to fetch package data
+  const fetchPackages = useCallback((token) => {
+    setLoading(true);
+    
+    if (token) {
+      // If logged in, try to get real data from API
+      axios.get(getApiUrl(`/api/package/game/${gameId}`), {
+        headers: getApiHeaders()
+      })
+        .then((response) => {
+          setGameData(response.data.data || []);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching package data:", error);
+          // Use the correct mock data for this game
+          setGameData(mockPackageData[gameId] || []);
+          setLoading(false);
+        });
+    } else {
+      // If not logged in, use mock data immediately
+      setGameData(mockPackageData[gameId] || []);
+      setLoading(false);
+    }
+  }, [gameId]);
 
   useEffect(() => {
     // Check if user is logged in
@@ -41,33 +67,7 @@ const GamePage = () => {
       window.removeEventListener('authChange', handleAuthChange);
       window.removeEventListener('storage', handleAuthChange);
     };
-  }, [gameId]);
-
-  // Function to fetch package data
-  const fetchPackages = (token) => {
-    setLoading(true);
-    
-    if (token) {
-      // If logged in, try to get real data from API
-      axios.get(getApiUrl(`/api/package/game/${gameId}`), {
-        headers: getApiHeaders()
-      })
-        .then((response) => {
-          setGameData(response.data.data || []);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching package data:", error);
-          // Use the correct mock data for this game
-          setGameData(mockPackageData[gameId] || []);
-          setLoading(false);
-        });
-    } else {
-      // If not logged in, use mock data immediately
-      setGameData(mockPackageData[gameId] || []);
-      setLoading(false);
-    }
-  };
+  }, [gameId, fetchPackages]);
 
 function handleCheckUsername(e) {
   e.preventDefault();

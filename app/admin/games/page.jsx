@@ -97,7 +97,7 @@ export default function AdminGamesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {games.length === 0 ? (
           <div className="col-span-3 bg-gray-800 rounded-lg p-8 text-center text-gray-400">
-            No games found. Click "Add New Game" to create one.
+            No games found. Click &quot;Add New Game&quot; to create one.
           </div>
         ) : (
           games.map((game) => (

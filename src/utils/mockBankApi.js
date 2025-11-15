@@ -2,6 +2,11 @@
 
 // Initialize bank data in localStorage if it doesn't exist
 const initBankData = () => {
+  // Check if we're in the browser
+  if (typeof window === 'undefined') {
+    return
+  }
+  
   if (!localStorage.getItem('bankData')) {
     localStorage.setItem('bankData', JSON.stringify([]));
   }
@@ -9,6 +14,11 @@ const initBankData = () => {
 
 // Initialize with some sample data if empty
 export const initWithSampleData = () => {
+  // Check if we're in the browser
+  if (typeof window === 'undefined') {
+    return []
+  }
+  
   initBankData();
   const banks = getAllBanks();
   
@@ -60,12 +70,22 @@ export const initWithSampleData = () => {
 
 // Get all bank details
 export const getAllBanks = () => {
+  // Check if we're in the browser
+  if (typeof window === 'undefined') {
+    return []
+  }
+  
   initBankData();
   return JSON.parse(localStorage.getItem('bankData'));
 };
 
 // Add a new bank
 export const addBank = (bankData) => {
+  // Check if we're in the browser
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot access localStorage on server')
+  }
+  
   const banks = getAllBanks();
   const newBank = {
     ...bankData,
@@ -80,6 +100,11 @@ export const addBank = (bankData) => {
 
 // Update a bank
 export const updateBank = (id, bankData) => {
+  // Check if we're in the browser
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot access localStorage on server')
+  }
+  
   const banks = getAllBanks();
   const index = banks.findIndex(bank => bank._id === id);
   
@@ -99,6 +124,11 @@ export const updateBank = (id, bankData) => {
 
 // Delete a bank
 export const deleteBank = (id) => {
+  // Check if we're in the browser
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot access localStorage on server')
+  }
+  
   const banks = getAllBanks();
   const filteredBanks = banks.filter(bank => bank._id !== id);
   
@@ -110,5 +140,8 @@ export const deleteBank = (id) => {
   return { success: true };
 };
 
-// Initialize with sample data immediately
-initWithSampleData();
+// Initialize with sample data only in browser
+if (typeof window !== 'undefined') {
+  initWithSampleData();
+}
+
