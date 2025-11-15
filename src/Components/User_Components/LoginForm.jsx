@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { decodeToken, login } from "../../utils/authUtils";
 import { getApiUrl, getApiHeaders } from "../../utils/apiUtils";
@@ -11,11 +10,6 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get the "from" location if it exists, otherwise default to home
-  const from = location.state?.from || "/";
   
   // Safe close function that checks if onClose is provided
   const safeClose = () => {
@@ -75,20 +69,14 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
         alert("Admin login successful!");
         safeClose();
         
-        // Navigate first, then reload (with a slight delay to ensure navigation completes)
-        navigate("/admin/Order");
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        // Redirect to admin panel
+        window.location.href = "/admin/Order";
       } else {
         alert("Login successful!");
         safeClose();
         
-        // Navigate to the "from" location or default home
-        navigate(from);
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        // Redirect to home
+        window.location.href = "/";
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -187,14 +175,34 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
 
       {/* Links */}
       <div className="text-center space-y-2 mt-4">
-        <Link to="/auth/reset" className="text-blue-400 hover:underline text-sm block">
-          Forgot password?
-        </Link>
+        {onShowReset ? (
+          <button
+            type="button"
+            onClick={onShowReset}
+            className="text-blue-400 hover:underline text-sm block w-full"
+          >
+            Forgot password?
+          </button>
+        ) : (
+          <a href="/auth/reset" className="text-blue-400 hover:underline text-sm block">
+            Forgot password?
+          </a>
+        )}
         <div className="text-gray-400 text-sm">
           Don&apos;t have an account?{" "}
-          <Link to="/auth/register" className="text-blue-400 hover:underline">
-            Register
-          </Link>
+          {onShowRegister ? (
+            <button
+              type="button"
+              onClick={onShowRegister}
+              className="text-blue-400 hover:underline"
+            >
+              Register
+            </button>
+          ) : (
+            <a href="/auth/register" className="text-blue-400 hover:underline">
+              Register
+            </a>
+          )}
         </div>
       </div>
     </div>

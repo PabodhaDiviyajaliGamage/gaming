@@ -66,14 +66,21 @@ const Users = () => {
         });
         console.log("Primary API response:", res.data);
         
-        // Make sure res.data is an array
-        if (Array.isArray(res.data)) {
+        // Handle different response formats from API
+        if (res.data.success && Array.isArray(res.data.data)) {
+          // Format: { success: true, data: [...] }
+          fetchedUsers = res.data.data;
+          apiSuccess = true;
+        } else if (Array.isArray(res.data)) {
+          // Format: [...]
           fetchedUsers = res.data;
           apiSuccess = true;
         } else if (res.data && Array.isArray(res.data.users)) {
+          // Format: { users: [...] }
           fetchedUsers = res.data.users;
           apiSuccess = true;
         } else if (res.data && typeof res.data === 'object') {
+          // Single object response
           fetchedUsers = [res.data];
           apiSuccess = true;
         }
@@ -433,8 +440,12 @@ const Users = () => {
           dataToSend,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        apiSuccess = true;
-        console.log("Update successful via PUT /api/users/:id", response.data);
+        
+        // Check if response indicates success
+        if (response.data && (response.data.success || response.status === 200)) {
+          apiSuccess = true;
+          console.log("Update successful via PUT /api/users/:id", response.data);
+        }
       } catch (putError) {
         console.error("PUT request failed, trying PATCH", putError);
         
@@ -561,7 +572,14 @@ const Users = () => {
         );
         
         console.log("User created successfully:", response.data);
-        apiSuccess = true;
+        
+        // Check if the API response indicates success
+        if (response.data && response.data.success) {
+          apiSuccess = true;
+        } else if (response.status === 201 || response.status === 200) {
+          // Consider it successful if status is 200/201 even without success flag
+          apiSuccess = true;
+        }
       } catch (mainError) {
         console.error("Primary create endpoint failed:", mainError);
         

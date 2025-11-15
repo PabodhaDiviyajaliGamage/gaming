@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getApiUrl, getApiHeaders } from "../../utils/apiUtils";
 
@@ -8,7 +7,6 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -95,7 +93,7 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
         if (typeof onShowLogin === 'function') {
           onShowLogin(); // Switch to login modal
         } else {
-          navigate("/"); // Redirect to home
+          window.location.href = "/"; // Redirect to home
         }
       }
     } catch (err) {
@@ -280,9 +278,19 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
       <div className="text-center space-y-2 mt-4">
         <div className="text-gray-400 text-sm">
           Already have an account?{" "}
-          <Link to="/auth/login" className="text-blue-400 hover:underline">
-            Login
-          </Link>
+          {onShowLogin ? (
+            <button
+              type="button"
+              onClick={onShowLogin}
+              className="text-blue-400 hover:underline"
+            >
+              Login
+            </button>
+          ) : (
+            <a href="/auth/login" className="text-blue-400 hover:underline">
+              Login
+            </a>
+          )}
         </div>
       </div>
     </div>

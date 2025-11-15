@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { getApiUrl, getApiHeaders } from "../../utils/apiUtils";
 
@@ -55,23 +54,37 @@ export default function ResetPassword({ onClose, onShowLogin, onShowRegister }) 
 
         {/* Nav Buttons */}
         <div className="flex justify-center gap-2 mb-6">
-          <Link to={"/auth/Login"}>
+          {onShowLogin ? (
             <button
               onClick={onShowLogin}
               className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold text-sm"
             >
               Login
             </button>
-          </Link>
+          ) : (
+            <a 
+              href="/auth/Login"
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold text-sm inline-block"
+            >
+              Login
+            </a>
+          )}
 
-          <Link to={"/auth/Register"}>
+          {onShowRegister ? (
             <button
               onClick={onShowRegister}
               className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold text-sm"
             >
               Register
             </button>
-          </Link>
+          ) : (
+            <a 
+              href="/auth/Register"
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold text-sm inline-block"
+            >
+              Register
+            </a>
+          )}
         </div>
 
         {/* Input */}
