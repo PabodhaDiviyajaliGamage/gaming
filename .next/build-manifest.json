@@ -1,132 +1,19 @@
 {
   "polyfillFiles": [
-    "static/chunks/polyfills-42372ed130431b0a.js"
+    "static/chunks/polyfills.js"
   ],
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/VdOAN_XAaVWw6ecrrUIjm/_buildManifest.js",
-    "static/VdOAN_XAaVWw6ecrrUIjm/_ssgManifest.js"
+    "static/development/_buildManifest.js",
+    "static/development/_ssgManifest.js"
   ],
   "rootMainFiles": [
-    "static/chunks/webpack-81d79d30ade76a3e.js",
-    "static/chunks/fd9d1056-9f91b5e418130764.js",
-    "static/chunks/117-b06ad745578f0d64.js",
-    "static/chunks/main-app-c67f25cb8ff99d3c.js"
+    "static/chunks/webpack.js",
+    "static/chunks/main-app.js"
   ],
   "pages": {
-    "/Admin_Dashbord/Bank_Detail": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/729-f61ab3e4c513009d.js",
-      "static/chunks/pages/Admin_Dashbord/Bank_Detail-552ae36251551847.js"
-    ],
-    "/Admin_Dashbord/Games": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/pages/Admin_Dashbord/Games-aeefafeae111b684.js"
-    ],
-    "/Admin_Dashbord/Orders": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/pages/Admin_Dashbord/Orders-dd7a6602615e7af8.js"
-    ],
-    "/Admin_Dashbord/Package": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/pages/Admin_Dashbord/Package-19ba56219cce0d97.js"
-    ],
-    "/Admin_Dashbord/Settings": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/pages/Admin_Dashbord/Settings-085ff4cc5d3c2a23.js"
-    ],
-    "/Admin_Dashbord/Users": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/pages/Admin_Dashbord/Users-b1e54533de26c9d4.js"
-    ],
-    "/TopUp/CheckoutPage": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/484-5a4456be7e13637f.js",
-      "static/chunks/729-f61ab3e4c513009d.js",
-      "static/chunks/pages/TopUp/CheckoutPage-cadfdfd2eee8720f.js"
-    ],
-    "/TopUp/FreeFireIndonesiaTopUp": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/484-5a4456be7e13637f.js",
-      "static/chunks/729-f61ab3e4c513009d.js",
-      "static/chunks/pages/TopUp/FreeFireIndonesiaTopUp-2a64cba0652b7335.js"
-    ],
-    "/TopUp/FreeFireSGTopUp": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/484-5a4456be7e13637f.js",
-      "static/chunks/729-f61ab3e4c513009d.js",
-      "static/chunks/pages/TopUp/FreeFireSGTopUp-16724ba90e9f71ed.js"
-    ],
-    "/TopUp/PUBGMobileTopUp": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/484-5a4456be7e13637f.js",
-      "static/chunks/729-f61ab3e4c513009d.js",
-      "static/chunks/pages/TopUp/PUBGMobileTopUp-a27f34ff12d8e9fa.js"
-    ],
-    "/User Page/GamePage": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/484-5a4456be7e13637f.js",
-      "static/chunks/pages/User Page/GamePage-5e8c41feb2900aea.js"
-    ],
-    "/User Page/Home": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/f0555afa-b2a6a91a31c78812.js",
-      "static/chunks/66-62f909477d36a070.js",
-      "static/chunks/484-5a4456be7e13637f.js",
-      "static/chunks/pages/User Page/Home-23bf4fe48ad2fa0b.js"
-    ],
-    "/_app": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/pages/_app-72b849fbd24ac258.js"
-    ],
-    "/_error": [
-      "static/chunks/webpack-81d79d30ade76a3e.js",
-      "static/chunks/framework-0943e7964e47553d.js",
-      "static/chunks/main-028df12963c109a8.js",
-      "static/chunks/pages/_error-7ba65e1336b92748.js"
-    ]
+    "/_app": []
   },
   "ampFirstPages": []
 }

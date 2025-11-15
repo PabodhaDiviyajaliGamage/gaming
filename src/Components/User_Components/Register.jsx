@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import OTP from "./OTP";
 import { getApiUrl, getApiHeaders } from "../../utils/apiUtils";
 
 export default function Register({ onClose, onShowLogin, onShowReset }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showOtpModal, setShowOtpModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -56,6 +53,11 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
       return;
     }
 
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters!");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -66,21 +68,19 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
         phone: formData.phone,
       });
       
-      const res = await axios.post(getApiUrl("/api/users/auth/register"), {
+      const res = await axios.post(getApiUrl("/api/users"), {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword,
         phone: formData.phone,
-        role: formData.role,
+        role: "user", // Default to user role
       });
 
-      if (res.data) {
+      if (res.data && res.data.success) {
         console.log("Registration response:", res.data);
-        alert("Registration successful! Please check your email for OTP.");
-        setUserId(res.data.tempUserId); // Backend eken userId ena eka yawanna one
-        setShowOtpModal(true);
-
+        alert("Registration successful! You can now login with your credentials.");
+        
+        // Clear form
         setFormData({
           firstName: "",
           lastName: "",
@@ -90,6 +90,13 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
           confirmPassword: "",
           role: "customer",
         });
+        
+        // Close modal or redirect to login
+        if (typeof onShowLogin === 'function') {
+          onShowLogin(); // Switch to login modal
+        } else {
+          navigate("/"); // Redirect to home
+        }
       }
     } catch (err) {
       console.error("Registration error:", err);
@@ -278,11 +285,6 @@ export default function Register({ onClose, onShowLogin, onShowReset }) {
           </Link>
         </div>
       </div>
-
-      {/* OTP Modal */}
-      {showOtpModal && (
-        <OTP userId={userId} onClose={() => setShowOtpModal(false)} />
-      )}
     </div>
   );
 }

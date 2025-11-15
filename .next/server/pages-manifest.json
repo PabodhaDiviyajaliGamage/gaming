@@ -1,17 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/Admin_Dashbord/Bank_Detail": "pages/Admin_Dashbord/Bank_Detail.js",
-  "/Admin_Dashbord/Games": "pages/Admin_Dashbord/Games.js",
-  "/Admin_Dashbord/Orders": "pages/Admin_Dashbord/Orders.js",
-  "/Admin_Dashbord/Package": "pages/Admin_Dashbord/Package.js",
-  "/Admin_Dashbord/Settings": "pages/Admin_Dashbord/Settings.js",
-  "/Admin_Dashbord/Users": "pages/Admin_Dashbord/Users.js",
-  "/TopUp/CheckoutPage": "pages/TopUp/CheckoutPage.js",
-  "/TopUp/FreeFireIndonesiaTopUp": "pages/TopUp/FreeFireIndonesiaTopUp.js",
-  "/TopUp/FreeFireSGTopUp": "pages/TopUp/FreeFireSGTopUp.js",
-  "/TopUp/PUBGMobileTopUp": "pages/TopUp/PUBGMobileTopUp.js",
-  "/User Page/GamePage": "pages/User Page/GamePage.js",
-  "/User Page/Home": "pages/User Page/Home.js",
-  "/_document": "pages/_document.js"
-}
+{}

@@ -41,103 +41,34 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
       
       console.log("Attempting login with:", loginData);
 
-      // Check if the API endpoint is correct - try with different endpoint structures
-      let res;
-      try {
-        res = await axios.post(getApiUrl("/api/users/auth/login"), loginData);
-      } catch (loginError) {
-        console.error("First login attempt failed:", loginError);
-        
-        // Try alternate endpoint format
-        try {
-          res = await axios.post(getApiUrl("/api/auth/login"), loginData);
-        } catch (altLoginError) {
-          console.error("Second login attempt failed:", altLoginError);
-          throw loginError; // Throw the original error if both fail
-        }
-      }
+      // Call the auth/login API endpoint
+      const res = await axios.post(getApiUrl("/api/auth/login"), loginData);
 
       console.log("Login response:", res.data);
       
-      if (!res.data.token) {
-        throw new Error("No token received from server");
+      if (!res.data.success || !res.data.token) {
+        throw new Error(res.data.message || "Login failed");
       }
       
       console.log("Token received:", res.data.token.substring(0, 20) + "...");
       
-      // Try to get user role and name from different possible sources
-      let isAdmin = false;
-      let userRole = "user"; // Default role
-      let userName = ""; // Store user's name
-      let userData = {};
+      // Extract user data from response
+      const userData = res.data.user || {};
+      const userRole = userData.role || "user";
+      const isAdmin = userRole === "admin";
+      const userName = userData.name || "";
       
-      // 1. Check if user object is in the response
-      if (res.data.user) {
-        // Extract role
-        if (res.data.user.role) {
-          userRole = res.data.user.role;
-          isAdmin = userRole === "admin";
-          userData.role = userRole;
-        }
-        
-        // Extract name (checking different possible field names)
-        userName = res.data.user.name || 
-                  res.data.user.firstName || 
-                  res.data.user.fullName || 
-                  res.data.user.username || 
-                  "";
-        if (userName) {
-          userData.name = userName;
-        }
-      } 
-      // 2. Check if role is directly in the response
-      else if (res.data.role) {
-        userRole = res.data.role;
-        isAdmin = userRole === "admin";
-        userData.role = userRole;
-        
-        // Check for name in the direct response
-        userName = res.data.name || 
-                  res.data.firstName || 
-                  res.data.fullName || 
-                  res.data.username || 
-                  "";
-        if (userName) {
-          userData.name = userName;
-        }
-      } 
-      // 3. Try to extract role from the JWT token
-      else {
-        try {
-          const decodedToken = decodeToken(res.data.token);
-          console.log("Decoded token:", decodedToken);
-          
-          if (decodedToken) {
-            // Extract role from token
-            if (decodedToken.role) {
-              userRole = decodedToken.role;
-              isAdmin = userRole === "admin";
-              userData.role = userRole;
-            }
-            
-            // Extract name from token
-            userName = decodedToken.name || 
-                      decodedToken.firstName || 
-                      decodedToken.fullName || 
-                      decodedToken.username || 
-                      "";
-            if (userName) {
-              userData.name = userName;
-            }
-          }
-        } catch (decodeError) {
-          console.error("Error decoding token:", decodeError);
-          // Continue with default user role
-        }
-      }
+      // Store user data in userData object for login utility
+      const userDataToStore = {
+        role: userRole,
+        name: userName,
+        email: userData.email,
+        userId: userData.userId,
+        phone: userData.phone
+      };
       
       // Use the login utility to store token and user data and trigger auth event
-      login(res.data.token, userData);
+      login(res.data.token, userDataToStore);
       
       // Check if user is admin and redirect accordingly
       if (isAdmin) {
@@ -165,19 +96,17 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
       // Detailed error logging
       if (err.response) {
         // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         console.error("Response data:", err.response.data);
         console.error("Response status:", err.response.status);
-        console.error("Response headers:", err.response.headers);
-        setError(err.response.data?.message || `Server error: ${err.response.status}`);
+        setError(err.response.data?.message || err.response.data?.error || `Invalid email or password`);
       } else if (err.request) {
         // The request was made but no response was received
         console.error("No response received:", err.request);
-        setError("No response from server. Please check your connection.");
+        setError("Cannot connect to server. Please check your connection.");
       } else {
         // Something happened in setting up the request that triggered an Error
-        console.error("Error setting up request:", err.message);
-        setError(`Login failed: ${err.message}`);
+        console.error("Error:", err.message);
+        setError(err.message || "Login failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -253,23 +182,6 @@ export default function LoginForm({ onClose, onShowRegister, onShowReset }) {
               Close
             </button>
           )}
-        </div>
-      </div>
-
-      {/* Sample Credentials */}
-      <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 my-4">
-        <h3 className="text-center text-yellow-400 font-medium mb-2">Test Accounts</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-700 p-3 rounded">
-            <h4 className="text-green-400 font-medium mb-1">Regular User</h4>
-            <p className="text-sm text-gray-300">Email: <span className="text-white">user@mail.com</span></p>
-            <p className="text-sm text-gray-300">Password: <span className="text-white">user@123</span></p>
-          </div>
-          <div className="bg-gray-700 p-3 rounded">
-            <h4 className="text-blue-400 font-medium mb-1">Admin User</h4>
-            <p className="text-sm text-gray-300">Email: <span className="text-white">admin@mail.com</span></p>
-            <p className="text-sm text-gray-300">Password: <span className="text-white">admin@123</span></p>
-          </div>
         </div>
       </div>
 

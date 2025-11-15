@@ -3,7 +3,9 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api'
 
 export const getApiUrl = (endpoint) => {
-  return `${API_BASE_URL}/${endpoint}`
+  // Remove leading slash from endpoint if present to avoid double slashes
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint
+  return `${API_BASE_URL}/${cleanEndpoint}`
 }
 
 export const getApiHeaders = (token) => {
