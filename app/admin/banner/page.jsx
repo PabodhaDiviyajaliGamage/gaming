@@ -1,20 +1,44 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 export default function AdminBannerPage() {
+  const [banner, setBanner] = useState(null)
   const [bannerImage, setBannerImage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [newBannerImage, setNewBannerImage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     loadBanner()
   }, [])
 
-  const loadBanner = () => {
-    const savedBanner = localStorage.getItem('headerBanner')
-    if (savedBanner) {
-      setBannerImage(savedBanner)
+  const loadBanner = async () => {
+    try {
+      setLoading(true)
+      const res = await axios.get('/api/banners?type=header')
+      
+      if (res.data.success && res.data.data.length > 0) {
+        const activeBanner = res.data.data.find(b => b.status === 'active') || res.data.data[0]
+        setBanner(activeBanner)
+        setBannerImage(activeBanner.image)
+      } else {
+        // Fallback to localStorage for migration
+        const savedBanner = localStorage.getItem('headerBanner')
+        if (savedBanner) {
+          setBannerImage(savedBanner)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading banner:', error)
+      // Fallback to localStorage
+      const savedBanner = localStorage.getItem('headerBanner')
+      if (savedBanner) {
+        setBannerImage(savedBanner)
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -28,15 +52,31 @@ export default function AdminBannerPage() {
     setShowModal(true)
   }
 
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete the header banner?')) {
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete the header banner?')) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      
+      if (banner && banner._id) {
+        await axios.delete(`/api/banners?id=${banner._id}`)
+      }
+      
       localStorage.removeItem('headerBanner')
+      setBanner(null)
       setBannerImage('')
       alert('Banner deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting banner:', error)
+      alert('Error deleting banner: ' + (error.response?.data?.error || error.message))
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
     if (!newBannerImage) {
@@ -44,10 +84,42 @@ export default function AdminBannerPage() {
       return
     }
 
-    localStorage.setItem('headerBanner', newBannerImage)
-    setBannerImage(newBannerImage)
-    setShowModal(false)
-    alert(bannerImage ? 'Banner updated successfully!' : 'Banner added successfully!')
+    try {
+      setLoading(true)
+
+      if (banner && banner._id) {
+        // Update existing banner
+        const res = await axios.put('/api/banners', {
+          _id: banner._id,
+          image: newBannerImage,
+          type: 'header',
+          status: 'active'
+        })
+        setBanner(res.data.data)
+        setBannerImage(res.data.data.image)
+      } else {
+        // Create new banner
+        const res = await axios.post('/api/banners', {
+          image: newBannerImage,
+          type: 'header',
+          title: 'Header Banner',
+          status: 'active'
+        })
+        setBanner(res.data.data)
+        setBannerImage(res.data.data.image)
+      }
+
+      // Also save to localStorage for backward compatibility
+      localStorage.setItem('headerBanner', newBannerImage)
+      
+      setShowModal(false)
+      alert(banner ? 'Banner updated successfully!' : 'Banner added successfully!')
+    } catch (error) {
+      console.error('Error saving banner:', error)
+      alert('Error saving banner: ' + (error.response?.data?.error || error.message))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -60,7 +132,12 @@ export default function AdminBannerPage() {
       </div>
 
       <div className="bg-gray-800 rounded-lg p-6">
-        {bannerImage ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">⏳</div>
+            <p className="text-gray-400">Loading...</p>
+          </div>
+        ) : bannerImage ? (
           <div>
             <div className="mb-4">
               <h2 className="text-xl font-bold mb-3">Current Banner</h2>
@@ -75,15 +152,17 @@ export default function AdminBannerPage() {
             <div className="flex gap-3">
               <button
                 onClick={handleUpdate}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition"
+                disabled={loading}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition"
               >
-                Update Banner
+                {loading ? 'Processing...' : 'Update Banner'}
               </button>
               <button
                 onClick={handleDelete}
-                className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition"
+                disabled={loading}
+                className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition"
               >
-                Delete Banner
+                {loading ? 'Processing...' : 'Delete Banner'}
               </button>
             </div>
           </div>
@@ -165,14 +244,16 @@ export default function AdminBannerPage() {
                 <div className="flex gap-3 pt-4">
                   <button
                     type="submit"
-                    className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition"
+                    disabled={loading}
+                    className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition"
                   >
-                    {bannerImage ? 'Update' : 'Add'} Banner
+                    {loading ? 'Saving...' : (banner ? 'Update' : 'Add') + ' Banner'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold transition"
+                    disabled={loading}
+                    className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-semibold transition"
                   >
                     Cancel
                   </button>

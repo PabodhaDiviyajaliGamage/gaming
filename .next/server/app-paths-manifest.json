@@ -1,1 +1,9 @@
-{}
+{
+  "/api/banners/route": "app/api/banners/route.js",
+  "/page": "app/page.js",
+  "/api/games/route": "app/api/games/route.js",
+  "/api/packages/route": "app/api/packages/route.js",
+  "/api/orders/route": "app/api/orders/route.js",
+  "/admin/orders/page": "app/admin/orders/page.js",
+  "/admin/banner/page": "app/admin/banner/page.js"
+}

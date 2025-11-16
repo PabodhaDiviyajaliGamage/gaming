@@ -42,13 +42,36 @@ export default function HomePage() {
       const name = localStorage.getItem('userName') || ''
       const role = localStorage.getItem('userRole') || ''
       const email = localStorage.getItem('userEmail') || ''
-      const banner = localStorage.getItem('headerBanner') || ''
       
       setIsLoggedIn(loggedIn)
       setUserName(name)
       setUserRole(role)
       setUserEmail(email)
-      setBannerImage(banner)
+      
+      // Load banner from MongoDB
+      try {
+        const axios = (await import('axios')).default
+        const bannerResponse = await axios.get('/api/banners?type=header')
+        if (bannerResponse.data.success && bannerResponse.data.data.length > 0) {
+          const activeBanner = bannerResponse.data.data.find(b => b.status === 'active')
+          if (activeBanner) {
+            setBannerImage(activeBanner.image)
+          } else {
+            // Fallback to localStorage
+            const banner = localStorage.getItem('headerBanner') || ''
+            setBannerImage(banner)
+          }
+        } else {
+          // Fallback to localStorage
+          const banner = localStorage.getItem('headerBanner') || ''
+          setBannerImage(banner)
+        }
+      } catch (error) {
+        console.error('Error loading banner:', error)
+        // Fallback to localStorage
+        const banner = localStorage.getItem('headerBanner') || ''
+        setBannerImage(banner)
+      }
       
       // Load games from MongoDB
       try {
