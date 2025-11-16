@@ -10,7 +10,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'slgaminghub-secret-key-2025'
 export async function POST(request) {
   try {
     await connectDB()
+    console.log('🔐 Login attempt received')
+    
     const { email, password } = await request.json()
+    console.log('📧 Email:', email)
     
     if (!email || !password) {
       return NextResponse.json(
@@ -23,49 +26,67 @@ export async function POST(request) {
     const user = await User.findOne({ email: email.toLowerCase() })
     
     if (!user) {
+      console.log('❌ User not found:', email)
       return NextResponse.json(
         { success: false, message: 'Invalid email or password' },
         { status: 401 }
       )
     }
     
-    let isPasswordValid = false
+    console.log('👤 User found:', user.email, '- Password format:', user.password ? user.password.substring(0, 10) + '...' : 'empty')
     
-    // Try bcrypt comparison first
-    try {
-      if (user.comparePassword) {
-        isPasswordValid = await user.comparePassword(password)
-      } else {
-        // Fallback: manual bcrypt compare
-        isPasswordValid = await bcrypt.compare(password, user.password)
+    let isPasswordValid = false
+    let needsMigration = false
+    
+    // First, check if password looks like a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+    const isBcryptHash = user.password && /^\$2[ayb]\$.{56}$/.test(user.password)
+    
+    if (isBcryptHash) {
+      // Password is hashed - use bcrypt comparison
+      try {
+        if (user.comparePassword) {
+          isPasswordValid = await user.comparePassword(password)
+        } else {
+          isPasswordValid = await bcrypt.compare(password, user.password)
+        }
+        console.log('Bcrypt comparison result:', isPasswordValid)
+      } catch (bcryptError) {
+        console.error('Bcrypt comparison error:', bcryptError)
+        isPasswordValid = false
       }
-    } catch (bcryptError) {
-      // If bcrypt fails, it might be a plain text password (legacy users)
-      // Check if password matches directly (for migration period)
+    } else {
+      // Password is NOT hashed (plain text) - direct comparison
+      console.log('Detected plain-text password for user:', user.email)
       if (user.password === password) {
         isPasswordValid = true
-        
-        // Auto-migrate: hash the password for next time
-        try {
-          const salt = await bcrypt.genSalt(10)
-          const hashedPassword = await bcrypt.hash(password, salt)
-          await User.updateOne(
-            { _id: user._id },
-            { $set: { password: hashedPassword } }
-          )
-          console.log('Auto-migrated plain text password to bcrypt for user:', user.email)
-        } catch (migrationError) {
-          console.error('Failed to auto-migrate password:', migrationError)
-        }
+        needsMigration = true
+      }
+    }
+    
+    // If password is valid and needs migration, hash it now
+    if (isPasswordValid && needsMigration) {
+      try {
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+        await User.updateOne(
+          { _id: user._id },
+          { $set: { password: hashedPassword } }
+        )
+        console.log('✅ Auto-migrated plain-text password to bcrypt for user:', user.email)
+      } catch (migrationError) {
+        console.error('❌ Failed to auto-migrate password:', migrationError)
       }
     }
     
     if (!isPasswordValid) {
+      console.log('Login failed for user:', user.email, '- Invalid password')
       return NextResponse.json(
         { success: false, message: 'Invalid email or password' },
         { status: 401 }
       )
     }
+    
+    console.log('✅ Login successful for user:', user.email)
     
     // Generate JWT token
     const token = jwt.sign(
