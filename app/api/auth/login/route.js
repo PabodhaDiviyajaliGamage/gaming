@@ -33,7 +33,9 @@ export async function POST(request) {
       )
     }
     
-    console.log('👤 User found:', user.email, '- Password format:', user.password ? user.password.substring(0, 10) + '...' : 'empty')
+    console.log('👤 User found:', user.email)
+    console.log('🔍 Stored password format:', user.password ? user.password.substring(0, 15) + '...' : 'empty')
+    console.log('🔍 Provided password:', password ? password.substring(0, 3) + '***' : 'empty')
     
     let isPasswordValid = false
     let needsMigration = false
@@ -41,25 +43,32 @@ export async function POST(request) {
     // First, check if password looks like a bcrypt hash (starts with $2a$, $2b$, or $2y$)
     const isBcryptHash = user.password && /^\$2[ayb]\$.{56}$/.test(user.password)
     
+    console.log('🔍 Is bcrypt hash?', isBcryptHash)
+    
     if (isBcryptHash) {
       // Password is hashed - use bcrypt comparison
+      console.log('🔐 Using bcrypt comparison...')
       try {
         if (user.comparePassword) {
           isPasswordValid = await user.comparePassword(password)
         } else {
           isPasswordValid = await bcrypt.compare(password, user.password)
         }
-        console.log('Bcrypt comparison result:', isPasswordValid)
+        console.log('✅ Bcrypt comparison result:', isPasswordValid)
       } catch (bcryptError) {
-        console.error('Bcrypt comparison error:', bcryptError)
+        console.error('❌ Bcrypt comparison error:', bcryptError.message)
         isPasswordValid = false
       }
     } else {
       // Password is NOT hashed (plain text) - direct comparison
-      console.log('Detected plain-text password for user:', user.email)
+      console.log('📝 Detected plain-text password for user:', user.email)
+      console.log('📝 Comparing:', password, '===', user.password)
       if (user.password === password) {
         isPasswordValid = true
         needsMigration = true
+        console.log('✅ Plain-text password matched!')
+      } else {
+        console.log('❌ Plain-text password did NOT match')
       }
     }
     
