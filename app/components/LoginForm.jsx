@@ -29,6 +29,7 @@ export default function LoginForm({ onClose, onShowRegister }) {
         localStorage.setItem("userName", res.data.user.name);
         localStorage.setItem("userRole", res.data.user.role);
         localStorage.setItem("userEmail", res.data.user.email);
+        localStorage.setItem("token", res.data.token); // Save token for API calls
 
         alert("Login successful!");
         window.location.href =

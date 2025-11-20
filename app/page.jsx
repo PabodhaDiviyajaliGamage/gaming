@@ -370,7 +370,267 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Player Details, Packages, Checkout Modals – unchanged UI, but logic fixed above */}
+      {/* Packages Modal */}
+      {showPackagesModal && selectedGame && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-gray-900 rounded-2xl max-w-4xl w-full p-8 my-8">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-3xl font-bold text-yellow-400">{selectedGame.name}</h2>
+                <p className="text-gray-400 mt-2">Select a package to top up</p>
+              </div>
+              <button
+                onClick={() => setShowPackagesModal(false)}
+                className="text-white bg-red-600 hover:bg-red-700 w-12 h-12 rounded-full text-2xl font-bold transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            {selectedGame.packages && selectedGame.packages.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  {selectedGame.packages.map((pkg) => (
+                    <div
+                      key={pkg.id}
+                      onClick={() => handlePackageSelect(pkg)}
+                      className={`bg-gray-800 border-2 rounded-xl p-6 cursor-pointer hover:shadow-xl hover:shadow-yellow-500/30 transition ${
+                        pkg.popular ? 'border-yellow-400' : 'border-gray-700 hover:border-yellow-400'
+                      }`}
+                    >
+                      {pkg.popular && (
+                        <div className="bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full inline-block mb-3">
+                          POPULAR
+                        </div>
+                      )}
+                      {pkg.image && (
+                        <img
+                          src={pkg.image}
+                          alt={pkg.amount}
+                          className="w-20 h-20 mx-auto mb-4 object-contain"
+                        />
+                      )}
+                      <h3 className="text-xl font-bold text-center mb-2">{pkg.amount}</h3>
+                      <p className="text-2xl font-bold text-yellow-400 text-center">{pkg.price}</p>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex justify-between items-center mt-6 p-4 bg-gray-800 rounded-lg">
+                  <label className="text-lg font-medium">Quantity:</label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setPackageQuantity(Math.max(1, packageQuantity - 1))}
+                      className="bg-red-600 hover:bg-red-700 w-10 h-10 rounded-lg font-bold text-xl transition"
+                    >
+                      -
+                    </button>
+                    <span className="text-2xl font-bold w-12 text-center">{packageQuantity}</span>
+                    <button
+                      onClick={() => setPackageQuantity(packageQuantity + 1)}
+                      className="bg-green-600 hover:bg-green-700 w-10 h-10 rounded-lg font-bold text-xl transition"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-xl text-gray-400">No packages available for this game</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Player Details Modal */}
+      {showPlayerDetailsModal && selectedPackage && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-2xl max-w-md w-full p-8">
+            <h2 className="text-3xl font-bold text-yellow-400 mb-6">Player Details</h2>
+            
+            <form onSubmit={handlePlayerDetailsSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Player ID / Game ID <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter your Player ID"
+                  value={playerDetails.playerId}
+                  onChange={(e) =>
+                    setPlayerDetails({ ...playerDetails, playerId: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-yellow-400 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Player Nickname <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter your Player Nickname"
+                  value={playerDetails.playerNickname}
+                  onChange={(e) =>
+                    setPlayerDetails({ ...playerDetails, playerNickname: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-yellow-400 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <p className="text-sm text-gray-400">Selected Package:</p>
+                <p className="text-xl font-bold text-yellow-400">{selectedPackage.amount}</p>
+                <p className="text-lg font-bold">{selectedPackage.price} × {selectedPackage.quantity}</p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPlayerDetailsModal(false);
+                    setShowPackagesModal(true);
+                  }}
+                  className="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black rounded-lg font-bold transition"
+                >
+                  Continue →
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Modal */}
+      {showCheckoutModal && selectedPackage && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-gray-900 rounded-2xl max-w-2xl w-full p-8 my-8">
+            <h2 className="text-3xl font-bold text-yellow-400 mb-6">Checkout</h2>
+
+            <form onSubmit={handleCheckoutSubmit} className="space-y-6">
+              {/* Order Summary */}
+              <div className="bg-gray-800 p-6 rounded-lg space-y-3">
+                <h3 className="text-xl font-bold mb-4">Order Summary</h3>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Game:</span>
+                  <span className="font-bold">{selectedGame.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Package:</span>
+                  <span className="font-bold">{selectedPackage.amount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Quantity:</span>
+                  <span className="font-bold">{selectedPackage.quantity}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Player ID:</span>
+                  <span className="font-bold">{playerDetails.playerId}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Nickname:</span>
+                  <span className="font-bold">{playerDetails.playerNickname}</span>
+                </div>
+                <hr className="border-gray-700 my-4" />
+                <div className="flex justify-between text-xl">
+                  <span className="text-yellow-400 font-bold">Total Amount:</span>
+                  <span className="text-yellow-400 font-bold">
+                    LKR {parseInt(selectedPackage.price.replace(/\D/g, "")) * selectedPackage.quantity}
+                  </span>
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div>
+                <label className="block text-lg font-medium mb-3">
+                  Payment Method <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("bank")}
+                    className={`p-4 rounded-lg border-2 font-bold transition ${
+                      paymentMethod === "bank"
+                        ? "border-yellow-400 bg-yellow-400 bg-opacity-20"
+                        : "border-gray-700 bg-gray-800 hover:border-gray-600"
+                    }`}
+                  >
+                    🏦 Bank Transfer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("card")}
+                    className={`p-4 rounded-lg border-2 font-bold transition ${
+                      paymentMethod === "card"
+                        ? "border-yellow-400 bg-yellow-400 bg-opacity-20"
+                        : "border-gray-700 bg-gray-800 hover:border-gray-600"
+                    }`}
+                  >
+                    💳 Card Payment
+                  </button>
+                </div>
+              </div>
+
+              {/* Payment Slip Upload */}
+              <div>
+                <label className="block text-lg font-medium mb-3">
+                  Upload Payment Slip <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setPaymentSlip(reader.result);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-yellow-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-yellow-400 file:text-black file:font-bold hover:file:bg-yellow-500"
+                  required
+                />
+                {paymentSlip && (
+                  <div className="mt-4">
+                    <img src={paymentSlip} alt="Payment slip preview" className="max-h-40 rounded-lg" />
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCheckoutModal(false);
+                    setShowPlayerDetailsModal(true);
+                  }}
+                  className="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-bold transition"
+                >
+                  Place Order 🎮
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-900 py-8 mt-20 text-center">

@@ -10,8 +10,8 @@ export function middleware(request) {
 
     if (!token || role !== "admin") {
       const loginUrl = new URL("/auth/login", request.url);
-      login.searchParams.set("redirect", path);
-      return NextResponse.redirect(login);
+      loginUrl.searchParams.set("redirect", path);
+      return NextResponse.redirect(loginUrl);
     }
   }
 

@@ -145,6 +145,15 @@ export async function POST(request) {
       path: "/",
     });
 
+    // Set userRole cookie for middleware
+    response.cookies.set("userRole", user.role || "user", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    });
+
     return response;
   } catch (error) {
     console.error("Login error:", error);
