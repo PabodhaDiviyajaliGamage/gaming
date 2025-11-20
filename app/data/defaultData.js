@@ -37,6 +37,7 @@ export const defaultPackages = [
     amount: '100 Diamonds',
     price: 'LKR 150',
     status: 'active',
+    popular: false,
     image: '/assets/cards/freefire.jpg',
     createdAt: new Date().toISOString()
   },
@@ -47,6 +48,7 @@ export const defaultPackages = [
     amount: '310 Diamonds',
     price: 'LKR 450',
     status: 'active',
+    popular: true,
     image: '/assets/cards/freefire.jpg',
     createdAt: new Date().toISOString()
   },
@@ -57,6 +59,7 @@ export const defaultPackages = [
     amount: '520 Diamonds',
     price: 'LKR 750',
     status: 'active',
+    popular: false,
     image: '/assets/cards/freefire.jpg',
     createdAt: new Date().toISOString()
   },
@@ -67,6 +70,29 @@ export const defaultPackages = [
     amount: '1060 Diamonds',
     price: 'LKR 1500',
     status: 'active',
+    popular: false,
+    image: '/assets/cards/freefire.jpg',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 13,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '2180 Diamonds',
+    price: 'LKR 3000',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/freefire.jpg',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 14,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '5600 Diamonds',
+    price: 'LKR 7500',
+    status: 'active',
+    popular: false,
     image: '/assets/cards/freefire.jpg',
     createdAt: new Date().toISOString()
   },

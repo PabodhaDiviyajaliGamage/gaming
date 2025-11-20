@@ -83,8 +83,18 @@ export default function HomePage() {
   };
 
   const handleTopUpClick = (game) => {
+    console.log('🎮 Game clicked:', game.name);
+    console.log('📦 All packages:', packages);
+    
     const gamePackages = packages
-      .filter((pkg) => (pkg.gameName || pkg.game) === game.name)
+      .filter((pkg) => {
+        const pkgGameName = (pkg.gameName || pkg.game || '').trim();
+        const gameName = (game.name || '').trim();
+        const matches = pkgGameName.toLowerCase() === gameName.toLowerCase();
+        
+        console.log(`Comparing: "${pkgGameName}" === "${gameName}" = ${matches}`);
+        return matches;
+      })
       .map((pkg) => ({
         id: pkg._id || pkg.id,
         amount: pkg.amount,
@@ -92,6 +102,8 @@ export default function HomePage() {
         image: pkg.image,
         popular: pkg.popular || false,
       }));
+
+    console.log('✅ Filtered packages for', game.name, ':', gamePackages);
 
     setSelectedGame({
       ...game,
