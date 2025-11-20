@@ -18,6 +18,7 @@ export default function HomePage() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [packageQuantity, setPackageQuantity] = useState(1);
+  const [packageQuantities, setPackageQuantities] = useState({}); // Track quantity for each package
   const [playerDetails, setPlayerDetails] = useState({
     playerId: "",
     playerNickname: "",
@@ -97,6 +98,12 @@ export default function HomePage() {
       packages: gamePackages.length > 0 ? gamePackages : [],
     });
     setPackageQuantity(1);
+    // Initialize quantities for all packages
+    const initialQuantities = {};
+    gamePackages.forEach(pkg => {
+      initialQuantities[pkg.id] = 1;
+    });
+    setPackageQuantities(initialQuantities);
     setShowPackagesModal(true);
   };
 
@@ -107,7 +114,8 @@ export default function HomePage() {
       alert("Please login to purchase");
       return;
     }
-    setSelectedPackage({ ...pkg, quantity: packageQuantity });
+    const quantity = packageQuantities[pkg.id] || 1;
+    setSelectedPackage({ ...pkg, quantity: quantity });
     setShowPackagesModal(false);
     setShowPlayerDetailsModal(true);
   };
@@ -388,13 +396,16 @@ export default function HomePage() {
             </div>
 
             {selectedGame.packages && selectedGame.packages.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                  {selectedGame.packages.map((pkg) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {selectedGame.packages.map((pkg) => {
+                  const quantity = packageQuantities[pkg.id] || 1;
+                  const unitPrice = parseInt(pkg.price.replace(/\D/g, ""));
+                  const totalPrice = unitPrice * quantity;
+                  
+                  return (
                     <div
                       key={pkg.id}
-                      onClick={() => handlePackageSelect(pkg)}
-                      className={`bg-gray-800 border-2 rounded-xl p-6 cursor-pointer hover:shadow-xl hover:shadow-yellow-500/30 transition ${
+                      className={`bg-gray-800 border-2 rounded-xl p-6 hover:shadow-xl hover:shadow-yellow-500/30 transition ${
                         pkg.popular ? 'border-yellow-400' : 'border-gray-700 hover:border-yellow-400'
                       }`}
                     >
@@ -411,30 +422,54 @@ export default function HomePage() {
                         />
                       )}
                       <h3 className="text-xl font-bold text-center mb-2">{pkg.amount}</h3>
-                      <p className="text-2xl font-bold text-yellow-400 text-center">{pkg.price}</p>
+                      <p className="text-lg font-bold text-gray-300 text-center mb-1">{pkg.price}</p>
+                      
+                      {/* Quantity Controls */}
+                      <div className="flex items-center justify-center gap-2 my-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPackageQuantities(prev => ({
+                              ...prev,
+                              [pkg.id]: Math.max(1, (prev[pkg.id] || 1) - 1)
+                            }));
+                          }}
+                          className="bg-red-600 hover:bg-red-700 w-8 h-8 rounded-lg font-bold text-lg transition"
+                        >
+                          -
+                        </button>
+                        <span className="text-xl font-bold w-10 text-center">{quantity}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPackageQuantities(prev => ({
+                              ...prev,
+                              [pkg.id]: (prev[pkg.id] || 1) + 1
+                            }));
+                          }}
+                          className="bg-green-600 hover:bg-green-700 w-8 h-8 rounded-lg font-bold text-lg transition"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Total Price */}
+                      <div className="text-center mb-4">
+                        <p className="text-sm text-gray-400">Total</p>
+                        <p className="text-2xl font-bold text-yellow-400">LKR {totalPrice.toLocaleString()}</p>
+                      </div>
+
+                      {/* Select Button */}
+                      <button
+                        onClick={() => handlePackageSelect(pkg)}
+                        className="w-full py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black rounded-lg font-bold transition"
+                      >
+                        Select Package
+                      </button>
                     </div>
-                  ))}
-                </div>
-                
-                <div className="flex justify-between items-center mt-6 p-4 bg-gray-800 rounded-lg">
-                  <label className="text-lg font-medium">Quantity:</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setPackageQuantity(Math.max(1, packageQuantity - 1))}
-                      className="bg-red-600 hover:bg-red-700 w-10 h-10 rounded-lg font-bold text-xl transition"
-                    >
-                      -
-                    </button>
-                    <span className="text-2xl font-bold w-12 text-center">{packageQuantity}</span>
-                    <button
-                      onClick={() => setPackageQuantity(packageQuantity + 1)}
-                      className="bg-green-600 hover:bg-green-700 w-10 h-10 rounded-lg font-bold text-xl transition"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </>
+                  );
+                })}
+              </div>
             ) : (
               <div className="text-center py-12">
                 <p className="text-xl text-gray-400">No packages available for this game</p>
