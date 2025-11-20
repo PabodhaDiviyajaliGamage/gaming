@@ -67,14 +67,25 @@ export default function HomePage() {
         gamesAPI.getAll(),
         packagesAPI.getAll(),
       ]);
-      setGames(
-        gamesRes.data?.filter((g) => g.status === "active") || defaultGames
-      );
-      setPackages(
-        packagesRes.data?.filter((p) => p.status === "active") ||
-          defaultPackages
-      );
+      
+      console.log('📦 Games API Response:', gamesRes);
+      console.log('📦 Packages API Response:', packagesRes);
+      
+      const loadedGames = gamesRes.data?.filter((g) => g.status === "active") || [];
+      const loadedPackages = packagesRes.data?.filter((p) => p.status === "active") || [];
+      
+      console.log('✅ Loaded games:', loadedGames.length, loadedGames);
+      console.log('✅ Loaded packages:', loadedPackages.length, loadedPackages);
+      
+      // Use loaded data if available, otherwise fallback to defaults
+      setGames(loadedGames.length > 0 ? loadedGames : defaultGames);
+      setPackages(loadedPackages.length > 0 ? loadedPackages : defaultPackages);
+      
+      console.log('🎯 Final games set:', loadedGames.length > 0 ? loadedGames.length : defaultGames.length);
+      console.log('🎯 Final packages set:', loadedPackages.length > 0 ? loadedPackages.length : defaultPackages.length);
     } catch (err) {
+      console.error('❌ Error loading data:', err);
+      console.log('🔄 Using default data - Games:', defaultGames.length, 'Packages:', defaultPackages.length);
       setGames(defaultGames);
       setPackages(defaultPackages);
     }
@@ -299,6 +310,11 @@ export default function HomePage() {
             </h1>
           </div>
         )}
+        
+        {/* Debug Info - Remove in production */}
+        <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs p-2 rounded">
+          Games: {games.length} | Packages: {packages.length}
+        </div>
       </div>
 
       {/* Games Grid */}
@@ -314,9 +330,15 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {games.map((game) => {
-              const hasPackages = packages.some(
-                (pkg) => (pkg.gameName || pkg.game) === game.name
-              );
+              const gamePackagesCount = packages.filter(
+                (pkg) => {
+                  const pkgGameName = (pkg.gameName || pkg.game || '').trim().toLowerCase();
+                  const gameName = (game.name || '').trim().toLowerCase();
+                  return pkgGameName === gameName;
+                }
+              ).length;
+              const hasPackages = gamePackagesCount > 0;
+              
               return (
                 <div
                   key={game._id || game.id}
@@ -332,6 +354,16 @@ export default function HomePage() {
                     {game.name}
                   </h3>
                   <p className="text-gray-400 mb-6">{game.description}</p>
+                  
+                  {/* Debug badge */}
+                  {gamePackagesCount > 0 && (
+                    <div className="mb-2">
+                      <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+                        {gamePackagesCount} packages available
+                      </span>
+                    </div>
+                  )}
+                  
                   <button
                     className={`w-full py-4 rounded-xl font-bold text-lg transition ${
                       hasPackages
