@@ -461,8 +461,14 @@ export default function HomePage() {
 
       {/* Packages Modal */}
       {showPackagesModal && selectedGame && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-900 rounded-2xl max-w-4xl w-full p-8 my-8">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          onClick={() => setShowPackagesModal(false)}
+        >
+          <div 
+            className="bg-gray-900 rounded-2xl max-w-4xl w-full p-8 my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h2 className="text-3xl font-bold text-yellow-400">{selectedGame.name}</h2>
@@ -470,7 +476,7 @@ export default function HomePage() {
               </div>
               <button
                 onClick={() => setShowPackagesModal(false)}
-                className="text-white bg-red-600 hover:bg-red-700 w-12 h-12 rounded-full text-2xl font-bold transition"
+                className="text-white bg-red-600 hover:bg-red-700 w-12 h-12 rounded-full text-2xl font-bold transition flex items-center justify-center"
               >
                 ✕
               </button>
@@ -562,9 +568,23 @@ export default function HomePage() {
 
       {/* Player Details Modal */}
       {showPlayerDetailsModal && selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-2xl max-w-md w-full p-8">
-            <h2 className="text-3xl font-bold text-yellow-400 mb-6">Player Details</h2>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowPlayerDetailsModal(false)}
+        >
+          <div 
+            className="bg-gray-900 rounded-2xl max-w-md w-full p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl font-bold text-yellow-400">Player Details</h2>
+              <button
+                onClick={() => setShowPlayerDetailsModal(false)}
+                className="text-white bg-red-600 hover:bg-red-700 w-10 h-10 rounded-full text-xl font-bold transition flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
             
             <form onSubmit={handlePlayerDetailsSubmit} className="space-y-6">
               <div>
@@ -630,9 +650,23 @@ export default function HomePage() {
 
       {/* Checkout Modal */}
       {showCheckoutModal && selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-900 rounded-2xl max-w-2xl w-full p-8 my-8">
-            <h2 className="text-3xl font-bold text-yellow-400 mb-6">Checkout</h2>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          onClick={() => setShowCheckoutModal(false)}
+        >
+          <div 
+            className="bg-gray-900 rounded-2xl max-w-2xl w-full p-8 my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl font-bold text-yellow-400">Checkout</h2>
+              <button
+                onClick={() => setShowCheckoutModal(false)}
+                className="text-white bg-red-600 hover:bg-red-700 w-10 h-10 rounded-full text-xl font-bold transition flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
 
             <form onSubmit={handleCheckoutSubmit} className="space-y-6">
               {/* Order Summary */}
