@@ -29,7 +29,7 @@ export const defaultGames = [
 ]
 
 export const defaultPackages = [
-  // Free Fire Packages
+  // Free Fire Packages - Diamonds
   {
     id: 1,
     gameId: 1,
@@ -91,6 +91,194 @@ export const defaultPackages = [
     gameName: 'Free Fire',
     amount: '5600 Diamonds',
     price: 'LKR 7500',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/freefire.jpg',
+    createdAt: new Date().toISOString()
+  },
+  // Free Fire Membership Packages
+  {
+    id: 15,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Weekly Lite Membership',
+    price: 'LKR 120',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/1.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 16,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Weekly Membership',
+    price: 'LKR 470',
+    status: 'active',
+    popular: true,
+    image: '/assets/cards/2.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 17,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Monthly Membership',
+    price: 'LKR 2350',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/3.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 18,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Little Pack',
+    price: 'LKR 1180',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/4.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 19,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'VIP Pack',
+    price: 'LKR 2800',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/5.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 20,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'VIP Special',
+    price: 'LKR 2920',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/6.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 21,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Big Pack',
+    price: 'LKR 4200',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/7.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 22,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Super VIP',
+    price: 'LKR 5620',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/8.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 23,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '3000 Diamonds',
+    price: 'LKR 7050',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/9.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 24,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '5000 Diamonds',
+    price: 'LKR 11750',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/10.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 25,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '8000 Diamonds',
+    price: 'LKR 18850',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/11.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 26,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '10000 Diamonds',
+    price: 'LKR 23500',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/freefire.jpg',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 27,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Evo Access 3D',
+    price: 'LKR 190',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/12.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 28,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Evo Access 7D',
+    price: 'LKR 290',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/12.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 29,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Evo Access 30D',
+    price: 'LKR 790',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/12.png',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 30,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: 'Level Up Pass',
+    price: 'LKR 1300',
+    status: 'active',
+    popular: false,
+    image: '/assets/cards/freefire.jpg',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 31,
+    gameId: 1,
+    gameName: 'Free Fire',
+    amount: '25 Diamonds',
+    price: 'LKR 75',
     status: 'active',
     popular: false,
     image: '/assets/cards/freefire.jpg',
