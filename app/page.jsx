@@ -95,7 +95,7 @@ export default function HomePage() {
 
   const handleTopUpClick = (game) => {
     console.log('🎮 Game clicked:', game.name);
-    console.log('📦 All packages:', packages);
+    console.log('📦 All packages in state:', packages.length, packages);
     
     const gamePackages = packages
       .filter((pkg) => {
@@ -114,20 +114,28 @@ export default function HomePage() {
         popular: pkg.popular || false,
       }));
 
-    console.log('✅ Filtered packages for', game.name, ':', gamePackages);
+    console.log('✅ Filtered packages for', game.name, ':', gamePackages.length, 'packages');
+    console.log('📋 Package details:', gamePackages);
 
-    setSelectedGame({
+    const gameWithPackages = {
       ...game,
       packages: gamePackages.length > 0 ? gamePackages : [],
-    });
+    };
+    
+    console.log('🎯 Setting selectedGame with packages:', gameWithPackages);
+    setSelectedGame(gameWithPackages);
     setPackageQuantity(1);
+    
     // Initialize quantities for all packages
     const initialQuantities = {};
     gamePackages.forEach(pkg => {
       initialQuantities[pkg.id] = 1;
     });
     setPackageQuantities(initialQuantities);
+    console.log('📊 Package quantities initialized:', initialQuantities);
+    
     setShowPackagesModal(true);
+    console.log('✅ Modal should now be visible');
   };
 
   const handlePackageSelect = (pkg) => {
@@ -516,7 +524,11 @@ export default function HomePage() {
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h2 className="text-3xl font-bold text-yellow-400">{selectedGame.name}</h2>
-                <p className="text-gray-400 mt-2">Select a package to top up</p>
+                <p className="text-gray-400 mt-2">
+                  {selectedGame.packages && selectedGame.packages.length > 0 
+                    ? `${selectedGame.packages.length} packages available - Select a package to top up` 
+                    : 'Select a package to top up'}
+                </p>
               </div>
               <button
                 onClick={() => setShowPackagesModal(false)}
@@ -527,7 +539,8 @@ export default function HomePage() {
             </div>
 
             {selectedGame.packages && selectedGame.packages.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="max-h-[60vh] overflow-y-auto pr-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {selectedGame.packages.map((pkg) => {
                   const quantity = packageQuantities[pkg.id] || 1;
                   const unitPrice = parseInt(pkg.price.replace(/\D/g, ""));
@@ -600,6 +613,7 @@ export default function HomePage() {
                     </div>
                   );
                 })}
+              </div>
               </div>
             ) : (
               <div className="text-center py-12">
