@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="180" fill="#1a1a1a" stroke="none"/>
+  
+  <!-- Gaming Controller -->
+  <g transform="translate(200,160)">
+    <!-- Controller Body -->
+    <path d="M-80,-40 Q-100,-60 -120,-40 Q-140,-20 -120,20 Q-100,40 -80,40 L80,40 Q100,40 120,20 Q140,-20 120,-40 Q100,-60 80,-40 Z" 
+          fill="#4c5db8" stroke="#6366f1" stroke-width="3"/>
+    
+    <!-- Left D-pad -->
+    <g transform="translate(-60,0)">
+      <!-- Horizontal bar -->
+      <rect x="-15" y="-5" width="30" height="10" rx="2" fill="white"/>
+      <!-- Vertical bar -->
+      <rect x="-5" y="-15" width="10" height="30" rx="2" fill="white"/>
+    </g>
+    
+    <!-- Right Buttons -->
+    <g transform="translate(60,0)">
+      <circle cx="0" cy="-15" r="8" fill="white"/>
+      <circle cx="15" cy="0" r="8" fill="white"/>
+      <circle cx="0" cy="15" r="8" fill="white"/>
+      <circle cx="-15" cy="0" r="8" fill="white"/>
+    </g>
+    
+    <!-- SL Text on Controller -->
+    <text x="0" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2d3748">SL</text>
+  </g>
+  
+  <!-- Circular Border with Orange Accent -->
+  <circle cx="200" cy="200" r="170" fill="none" stroke="#f56500" stroke-width="8"/>
+  <circle cx="200" cy="200" r="155" fill="none" stroke="#4c5db8" stroke-width="6"/>
+  
+  <!-- Text -->
+  <text x="200" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#f56500">GAMING</text>
+  <text x="200" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#f56500">HUB</text>
+</svg>

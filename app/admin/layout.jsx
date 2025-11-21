@@ -59,7 +59,7 @@ export default function AdminLayout({ children }) {
   // Loading screen
   if (isLoading)
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+      <div className="min-h-screen bg-blue-100 flex items-center justify-center text-slate-800">
         Loading...
       </div>
     );
@@ -68,76 +68,85 @@ export default function AdminLayout({ children }) {
   if (!isAuthorized) return null;
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-blue-50">
       <div className="flex">
-        <aside className="w-64 bg-gray-800 min-h-screen p-4">
+        <aside className="w-64 bg-blue-50 min-h-screen p-4 border-r border-blue-200 shadow-sm">
           <div className="mb-6">
-            <h2 className="text-white text-xl font-bold mb-2">Admin Panel</h2>
-            <p className="text-gray-400 text-sm">{userName}</p>
+            <div className="flex items-center gap-3 mb-4">
+              <img 
+                src="/sl-gaming-hub-logo.svg" 
+                alt="SL Gaming Hub Logo" 
+                className="w-10 h-10 object-contain"
+              />
+              <div>
+                <h2 className="text-slate-800 text-xl font-bold">Admin Panel</h2>
+              </div>
+            </div>
+            <p className="text-slate-600 text-sm">{userName}</p>
           </div>
 
           <nav className="space-y-2">
             <Link
               href="/admin/orders"
-              className="block text-white hover:bg-gray-700 p-3 rounded transition"
+              className="block text-slate-700 hover:bg-blue-50 hover:text-blue-700 p-3 rounded transition"
             >
               📦 Orders
             </Link>
 
             <Link
               href="/admin/games"
-              className="block text-white hover:bg-gray-700 p-3 rounded transition"
+              className="block text-slate-700 hover:bg-blue-50 hover:text-blue-700 p-3 rounded transition"
             >
               🎮 Games
             </Link>
 
             <Link
               href="/admin/packages"
-              className="block text-white hover:bg-gray-700 p-3 rounded transition"
+              className="block text-slate-700 hover:bg-blue-50 hover:text-blue-700 p-3 rounded transition"
             >
               📦 Packages
             </Link>
 
             <Link
               href="/admin/users"
-              className="block text-white hover:bg-gray-700 p-3 rounded transition"
+              className="block text-slate-700 hover:bg-blue-50 hover:text-blue-700 p-3 rounded transition"
             >
               👥 Users
             </Link>
 
             <Link
               href="/admin/bank-details"
-              className="block text-white hover:bg-gray-700 p-3 rounded transition"
+              className="block text-slate-700 hover:bg-blue-50 hover:text-blue-700 p-3 rounded transition"
             >
               🏦 Bank Details
             </Link>
 
             <Link
               href="/admin/banner"
-              className="block text-white hover:bg-gray-700 p-3 rounded transition"
+              className="block text-slate-700 hover:bg-blue-50 hover:text-blue-700 p-3 rounded transition"
             >
               🖼️ Header Banner
             </Link>
 
-            <hr className="border-gray-700 my-4" />
+            <hr className="border-slate-300 my-4" />
 
             <Link
               href="/"
-              className="block text-blue-400 hover:bg-gray-700 p-3 rounded transition"
+              className="block text-blue-600 hover:bg-blue-50 p-3 rounded transition"
             >
               🏠 Back to Home
             </Link>
 
             <button
               onClick={handleLogout}
-              className="w-full text-left text-red-400 hover:bg-gray-700 p-3 rounded transition"
+              className="w-full text-left text-red-600 hover:bg-red-50 p-3 rounded transition"
             >
               🚪 Logout
             </button>
           </nav>
         </aside>
 
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 p-8 bg-blue-50">{children}</main>
       </div>
     </div>
   );

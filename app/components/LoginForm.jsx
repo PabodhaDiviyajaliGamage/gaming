@@ -43,10 +43,10 @@ export default function LoginForm({ onClose, onShowRegister }) {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto bg-gray-900 bg-opacity-90 text-white rounded-xl shadow-lg p-6 space-y-6">
+    <div className="max-w-md w-full mx-auto bg-blue-50 bg-opacity-95 text-slate-800 rounded-xl shadow-lg border border-blue-200 p-6 space-y-6">
       <div className="text-center">
-        <h2 className="text-lg font-medium text-gray-300">Welcome to</h2>
-        <h1 className="text-2xl font-bold text-orange-400">SL Gaming Hub</h1>
+        <h2 className="text-lg font-medium text-slate-600">Welcome to</h2>
+        <h1 className="text-2xl font-bold text-blue-600">SL Gaming Hub</h1>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-4">
@@ -59,7 +59,7 @@ export default function LoginForm({ onClose, onShowRegister }) {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full px-4 py-2 rounded-lg bg-slate-50 text-slate-800 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
@@ -74,11 +74,11 @@ export default function LoginForm({ onClose, onShowRegister }) {
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-2 rounded-lg bg-blue-100 text-slate-800 border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
             <span
-              className="absolute right-3 top-2.5 cursor-pointer text-gray-400 hover:text-white"
+              className="absolute right-3 top-2.5 cursor-pointer text-slate-500 hover:text-slate-700"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? "🙈" : "👁"}
@@ -86,13 +86,13 @@ export default function LoginForm({ onClose, onShowRegister }) {
           </div>
         </div>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <div className="flex gap-3">
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg font-semibold disabled:opacity-50 transition"
+            className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold disabled:opacity-50 transition text-white"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
@@ -100,7 +100,7 @@ export default function LoginForm({ onClose, onShowRegister }) {
             <button
               type="button"
               onClick={onClose}
-              className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-semibold transition"
+              className="w-full px-4 py-2 bg-slate-500 hover:bg-slate-600 rounded-lg font-semibold transition text-white"
             >
               Close
             </button>

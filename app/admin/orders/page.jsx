@@ -71,53 +71,53 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <div className="text-white">
+    <div className="text-slate-800">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-bold">Orders Management</h1>
-          <p className="text-gray-400 mt-2">Total Orders: {orders.length}</p>
+          <p className="text-slate-600 mt-2">Total Orders: {orders.length}</p>
         </div>
         <Link
           href="/"
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold"
+          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold text-white transition-colors"
         >
           ← Back to Home
         </Link>
       </div>
 
-      <div className="bg-gray-800 rounded-xl overflow-hidden shadow-xl">
+      <div className="bg-blue-100 rounded-xl overflow-hidden shadow-lg border border-blue-200">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-900">
+            <thead className="bg-blue-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Order #
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Customer
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Game & Package
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Amount
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Date
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-800">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-slate-200">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-16 text-gray-400">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-yellow-500 border-t-transparent"></div>
+                  <td colSpan="7" className="text-center py-16 text-slate-600">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
                     <p className="mt-4 text-xl">Loading orders...</p>
                   </td>
                 </tr>
@@ -125,34 +125,34 @@ export default function AdminOrdersPage() {
                 <tr>
                   <td
                     colSpan="7"
-                    className="text-center py-16 text-gray-400 text-xl"
+                    className="text-center py-16 text-slate-600 text-xl"
                   >
                     No orders found
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-750 transition">
-                    <td className="px-6 py-4 font-mono font-bold text-yellow-400">
+                  <tr key={order._id} className="hover:bg-blue-100 transition">
+                    <td className="px-6 py-4 font-mono font-bold text-blue-600">
                       {order.orderNumber}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold">{order.customerName}</div>
-                      <div className="text-sm text-gray-400">
+                      <div className="font-semibold text-slate-800">{order.customerName}</div>
+                      <div className="text-sm text-slate-600">
                         {order.customerEmail || order.phone}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium">{order.game}</div>
-                      <div className="text-sm text-gray-400">
+                      <div className="font-medium text-slate-800">{order.game}</div>
+                      <div className="text-sm text-slate-600">
                         {order.package}{" "}
                         {order.quantity > 1 && `×${order.quantity}`}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-slate-500 mt-1">
                         ID: {order.gameId} | {order.playerNickname}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-bold text-green-400">
+                    <td className="px-6 py-4 font-bold text-green-600">
                       LKR {order.amount?.toLocaleString() || "N/A"}
                     </td>
                     <td className="px-6 py-4">

@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const BannerSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['header', 'footer', 'sidebar'],
+    enum: ['header', 'footer', 'sidebar', 'slider'],
     default: 'header',
   },
   image: {

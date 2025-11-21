@@ -1,20 +1,19 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import logo from "../assets/logo.jpeg";
 
 function AuthLayout() {
   return (
-    <div className="bg-blue-950 min-h-screen">
+    <div className="bg-blue-50 min-h-screen">
       {/* Header */}
-      <header className="bg-gray-900 text-white shadow-md">
+      <header className="bg-blue-50 text-slate-800 shadow-md border-b border-blue-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
             <Link to="/">
               <img
-                src={logo}
-                alt="Logo"
-                className="w-12 h-12 rounded-full border-2 border-white"
+                src="/sl-gaming-hub-logo.svg"
+                alt="SL Gaming Hub Logo"
+                className="w-12 h-12 object-contain"
               />
             </Link>
             <span className="text-lg font-bold">SL Gaming Hub</span>
@@ -22,7 +21,7 @@ function AuthLayout() {
 
           {/* Navigation */}
           <div className="flex items-center gap-3">
-            <Link to="/" className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition">
+            <Link to="/" className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-semibold transition text-white">
               Home
             </Link>
           </div>
