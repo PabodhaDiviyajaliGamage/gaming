@@ -418,7 +418,7 @@ export default function HomePage() {
 
       {/* Hero Slider */}
       <div 
-        className="w-full h-64 md:h-[500px] lg:h-[600px] xl:h-[700px] relative overflow-hidden group"
+        className="w-[760px] h-[430px] mx-auto relative overflow-hidden group rounded-lg"
         onMouseEnter={() => setIsSliderPaused(true)}
         onMouseLeave={() => setIsSliderPaused(false)}
         onTouchStart={handleTouchStart}
@@ -457,31 +457,31 @@ export default function HomePage() {
         {/* Navigation Arrows - Hidden by default, shown on hover */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-200 group opacity-0 group-hover:opacity-100"
+          className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-all duration-200 group opacity-0 group-hover:opacity-100 z-20"
           aria-label="Previous slide"
         >
-          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-200 group opacity-0 group-hover:opacity-100"
+          className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-all duration-200 group opacity-0 group-hover:opacity-100 z-20"
           aria-label="Next slide"
         >
-          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
           {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 ${
+              className={`w-4 h-4 rounded-full transition-all duration-300 hover:scale-125 ${
                 index === currentSlide 
                   ? 'bg-white scale-125 shadow-lg' 
                   : 'bg-white/60 hover:bg-white/80'
@@ -492,7 +492,7 @@ export default function HomePage() {
         </div>
 
         {/* Slide Progress Bar */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20 z-20">
           <div 
             className="h-full bg-white transition-all duration-100 ease-linear"
             style={{ 
@@ -502,7 +502,7 @@ export default function HomePage() {
         </div>
 
         {/* Debug Info */}
-        <div className="absolute top-2 right-2 bg-white/90 text-slate-800 text-xs p-2 rounded border border-slate-200 backdrop-blur-sm">
+        <div className="absolute top-4 right-4 bg-white/90 text-slate-800 text-xs p-2 rounded border border-slate-200 backdrop-blur-sm z-20">
           Games: {games.length} | Packages: {packages.length} | Slide: {currentSlide + 1}/{heroSlides.length}
         </div>
       </div>
