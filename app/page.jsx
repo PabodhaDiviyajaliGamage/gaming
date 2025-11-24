@@ -78,47 +78,52 @@ export default function HomePage() {
 
   useEffect(() => {
     loadInitialData();
-    loadBankDetails();
   }, []);
 
-  const loadBankDetails = () => {
-    const savedBanks = localStorage.getItem('bankDetails');
-    if (savedBanks) {
-      setBankDetails(JSON.parse(savedBanks));
-    } else {
-      const sampleBanks = [
-        { 
-          id: 1, 
-          bankName: 'eZcash', 
-          accountName: 'SL Gaming Hub', 
-          accountNumber: '0773043667', 
-          branch: 'N/A', 
-          type: 'mobile',
-          status: 'active' 
-        },
-        { 
-          id: 2, 
-          bankName: 'eZcash', 
-          accountName: 'SL Gaming Hub', 
-          accountNumber: '0741880764', 
-          branch: 'N/A', 
-          type: 'mobile',
-          status: 'active' 
-        },
-        { 
-          id: 3, 
-          bankName: 'Bank of Ceylon', 
-          accountName: 'SL Gaming Hub (PVT) Ltd', 
-          accountNumber: '0012345678901', 
-          branch: 'Colombo Main', 
-          type: 'bank',
-          status: 'active' 
-        }
-      ];
-      localStorage.setItem('bankDetails', JSON.stringify(sampleBanks));
-      setBankDetails(sampleBanks);
+  useEffect(() => {
+    // Load bank details from localStorage
+    try {
+      const savedBanks = localStorage.getItem('bankDetails');
+      if (savedBanks) {
+        setBankDetails(JSON.parse(savedBanks));
+      } else {
+        const sampleBanks = [
+          { 
+            id: 1, 
+            bankName: 'eZcash', 
+            accountName: 'SL Gaming Hub', 
+            accountNumber: '0773043667', 
+            branch: 'N/A', 
+            type: 'mobile',
+            status: 'active' 
+          },
+          { 
+            id: 2, 
+            bankName: 'eZcash', 
+            accountName: 'SL Gaming Hub', 
+            accountNumber: '0741880764', 
+            branch: 'N/A', 
+            type: 'mobile',
+            status: 'active' 
+          },
+          { 
+            id: 3, 
+            bankName: 'Bank of Ceylon', 
+            accountName: 'SL Gaming Hub (PVT) Ltd', 
+            accountNumber: '0012345678901', 
+            branch: 'Colombo Main', 
+            type: 'bank',
+            status: 'active' 
+          }
+        ];
+        localStorage.setItem('bankDetails', JSON.stringify(sampleBanks));
+        setBankDetails(sampleBanks);
+      }
+    } catch (error) {
+      console.error('Error loading bank details:', error);
+      setBankDetails([]);
     }
-  };
+  }, []);
 
   // Hero Slider Auto-play
   useEffect(() => {
