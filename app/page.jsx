@@ -386,9 +386,13 @@ export default function HomePage() {
                     Admin Panel
                   </Link>
                 )}
-                <span className="text-blue-600 font-medium">
-                  Hi, {userName}
-                </span>
+                <Link
+                  href="/profile"
+                  className="text-blue-600 font-medium hover:text-blue-800 hover:underline transition-colors cursor-pointer"
+                  title="View Profile"
+                >
+                  Hi, {userName} 👤
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="px-5 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold text-white transition-colors"
