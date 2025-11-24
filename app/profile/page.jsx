@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
@@ -11,9 +11,15 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("profile"); // "profile" or "orders"
+  const fetchingRef = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple simultaneous fetches
+    if (fetchingRef.current) return;
+
     const fetchProfile = async () => {
+      fetchingRef.current = true;
+      
       try {
         // Check if user is logged in
         const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -36,6 +42,7 @@ export default function ProfilePage() {
 
         if (response.data.success) {
           setProfileData(response.data);
+          setError(null);
         } else {
           setError("Failed to load profile");
         }
@@ -57,7 +64,7 @@ export default function ProfilePage() {
     };
 
     fetchProfile();
-  }, [router]);
+  }, []); // Empty dependency array - only run once on mount
 
   const handleLogout = () => {
     localStorage.removeItem("token");

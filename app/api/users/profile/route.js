@@ -15,6 +15,7 @@ export async function GET(request) {
       request.cookies.get("auth-token")?.value;
 
     if (!token) {
+      console.log("❌ No token provided");
       return NextResponse.json(
         { success: false, message: "Not authenticated" },
         { status: 401 }
@@ -25,7 +26,9 @@ export async function GET(request) {
     let decoded;
     try {
       decoded = jwt.verify(token, JWT_SECRET);
+      console.log("✅ Token verified for user:", decoded.userId);
     } catch (err) {
+      console.error("❌ Token verification failed:", err.message);
       return NextResponse.json(
         { success: false, message: "Invalid or expired token" },
         { status: 401 }
@@ -33,25 +36,45 @@ export async function GET(request) {
     }
 
     // Connect to DB
-    await connectDB();
+    try {
+      await connectDB();
+      console.log("✅ Database connected");
+    } catch (dbError) {
+      console.error("❌ Database connection failed:", dbError);
+      return NextResponse.json(
+        { success: false, message: "Database connection failed" },
+        { status: 500 }
+      );
+    }
 
     // Fetch user details
     const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
+      console.log("❌ User not found:", decoded.userId);
       return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
     }
 
+    console.log("✅ User found:", user.name, user.email);
+
     // Fetch user's orders (matching by email or name)
-    const orders = await Order.find({
-      $or: [
-        { customerEmail: user.email },
-        { customerName: user.name }
-      ]
-    }).sort({ createdAt: -1 });
+    let orders = [];
+    try {
+      orders = await Order.find({
+        $or: [
+          { customerEmail: user.email },
+          { customerName: user.name }
+        ]
+      }).sort({ createdAt: -1 });
+      console.log(`✅ Found ${orders.length} orders for user`);
+    } catch (orderError) {
+      console.error("❌ Error fetching orders:", orderError);
+      // Continue without orders rather than failing
+      orders = [];
+    }
 
     return NextResponse.json({
       success: true,
