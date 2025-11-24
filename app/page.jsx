@@ -960,14 +960,14 @@ export default function HomePage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("card")}
+                    onClick={() => setPaymentMethod("mobile")}
                     className={`p-4 rounded-lg border-2 font-bold transition ${
-                      paymentMethod === "card"
+                      paymentMethod === "mobile"
                         ? "border-blue-500 bg-blue-200 text-blue-700"
                         : "border-blue-300 bg-blue-100 text-slate-700 hover:border-blue-400"
                     }`}
                   >
-                    💳 Card Payment
+                    📱 Mobile Payment
                   </button>
                 </div>
               </div>

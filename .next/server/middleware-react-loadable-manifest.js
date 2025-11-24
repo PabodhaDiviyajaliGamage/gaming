@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app/page.jsx -> axios\":{\"id\":\"app/page.jsx -> axios\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_axios_index_js.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST='{"app/page.jsx -> axios":{"id":3577,"files":["static/chunks/577.7f03df08313e1643.js"]}}';
