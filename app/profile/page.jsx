@@ -15,18 +15,24 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
         const token = localStorage.getItem("token");
         
-        if (!token) {
+        if (!isLoggedIn || !token) {
+          console.log("Not logged in, redirecting to home");
           router.push("/");
           return;
         }
 
+        console.log("Fetching profile data...");
         const response = await axios.get("/api/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
+        console.log("Profile response:", response.data);
 
         if (response.data.success) {
           setProfileData(response.data);
@@ -36,12 +42,14 @@ export default function ProfilePage() {
       } catch (err) {
         console.error("Error fetching profile:", err);
         if (err.response?.status === 401) {
+          console.log("Unauthorized, clearing session");
           localStorage.removeItem("token");
           localStorage.removeItem("userName");
           localStorage.removeItem("userRole");
+          localStorage.removeItem("isLoggedIn");
           router.push("/");
         } else {
-          setError(err.response?.data?.message || "Failed to load profile");
+          setError(err.response?.data?.message || "Failed to load profile. Please try again.");
         }
       } finally {
         setLoading(false);
@@ -94,14 +102,26 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Error</h2>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">Error Loading Profile</h2>
           <p className="text-slate-600 mb-6">{error}</p>
-          <Link
-            href="/"
-            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold transition-colors inline-block"
-          >
-            Go to Home
-          </Link>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                window.location.reload();
+              }}
+              className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold transition-colors"
+            >
+              Retry
+            </button>
+            <Link
+              href="/"
+              className="px-6 py-3 bg-slate-500 hover:bg-slate-600 text-white rounded-lg font-bold transition-colors inline-block"
+            >
+              Go to Home
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -337,11 +357,23 @@ export default function ProfilePage() {
                             </p>
                           </div>
                           <div>
+                            <p className="text-xs text-slate-500">Nickname</p>
+                            <p className="text-slate-800 font-medium text-sm">
+                              {order.playerNickname || "N/A"}
+                            </p>
+                          </div>
+                          <div>
                             <p className="text-xs text-slate-500">
                               Payment Method
                             </p>
                             <p className="text-slate-800 capitalize">
                               {order.paymentMethod}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500">Quantity</p>
+                            <p className="text-slate-800 font-medium">
+                              {order.quantity || 1}
                             </p>
                           </div>
                         </div>

@@ -74,10 +74,51 @@ export default function HomePage() {
   const [userEmail, setUserEmail] = useState("");
 
   const [loading, setLoading] = useState(true);
+  const [bankDetails, setBankDetails] = useState([]);
 
   useEffect(() => {
     loadInitialData();
+    loadBankDetails();
   }, []);
+
+  const loadBankDetails = () => {
+    const savedBanks = localStorage.getItem('bankDetails');
+    if (savedBanks) {
+      setBankDetails(JSON.parse(savedBanks));
+    } else {
+      const sampleBanks = [
+        { 
+          id: 1, 
+          bankName: 'eZcash', 
+          accountName: 'SL Gaming Hub', 
+          accountNumber: '0773043667', 
+          branch: 'N/A', 
+          type: 'mobile',
+          status: 'active' 
+        },
+        { 
+          id: 2, 
+          bankName: 'eZcash', 
+          accountName: 'SL Gaming Hub', 
+          accountNumber: '0741880764', 
+          branch: 'N/A', 
+          type: 'mobile',
+          status: 'active' 
+        },
+        { 
+          id: 3, 
+          bankName: 'Bank of Ceylon', 
+          accountName: 'SL Gaming Hub (PVT) Ltd', 
+          accountNumber: '0012345678901', 
+          branch: 'Colombo Main', 
+          type: 'bank',
+          status: 'active' 
+        }
+      ];
+      localStorage.setItem('bankDetails', JSON.stringify(sampleBanks));
+      setBankDetails(sampleBanks);
+    }
+  };
 
   // Hero Slider Auto-play
   useEffect(() => {
@@ -964,17 +1005,80 @@ export default function HomePage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("mobile")}
+                    onClick={() => setPaymentMethod("ezcash")}
                     className={`p-4 rounded-lg border-2 font-bold transition ${
-                      paymentMethod === "mobile"
-                        ? "border-blue-500 bg-blue-200 text-blue-700"
-                        : "border-blue-300 bg-blue-100 text-slate-700 hover:border-blue-400"
+                      paymentMethod === "ezcash"
+                        ? "border-green-500 bg-green-200 text-green-700"
+                        : "border-green-300 bg-green-100 text-slate-700 hover:border-green-400"
                     }`}
                   >
-                    📱 Mobile Payment
+                    💰 eZcash
                   </button>
                 </div>
               </div>
+
+              {/* Payment Details Display */}
+              {paymentMethod && (
+                <div className="bg-white border-2 border-slate-300 rounded-lg p-6">
+                  <h3 className="text-xl font-bold mb-4 text-slate-800">
+                    {paymentMethod === "bank" ? "🏦 Bank Transfer Details" : "💰 eZcash Payment Details"}
+                  </h3>
+                  <div className="space-y-4">
+                    {bankDetails
+                      .filter(bank => 
+                        (paymentMethod === "bank" && bank.type === "bank") ||
+                        (paymentMethod === "ezcash" && bank.type === "mobile")
+                      )
+                      .filter(bank => bank.status === "active")
+                      .map((bank) => (
+                        <div 
+                          key={bank.id} 
+                          className={`p-4 rounded-lg border-2 ${
+                            paymentMethod === "bank" 
+                              ? "bg-blue-50 border-blue-300" 
+                              : "bg-green-50 border-green-300"
+                          }`}
+                        >
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-xs text-slate-500 font-semibold">Bank/Service</p>
+                              <p className="text-slate-800 font-bold">{bank.bankName}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-500 font-semibold">Account Name</p>
+                              <p className="text-slate-800 font-bold">{bank.accountName}</p>
+                            </div>
+                            <div className="col-span-2">
+                              <p className="text-xs text-slate-500 font-semibold">
+                                {paymentMethod === "bank" ? "Account Number" : "Mobile Number"}
+                              </p>
+                              <p className="text-slate-800 font-bold text-lg tracking-wide font-mono">
+                                {bank.accountNumber}
+                              </p>
+                            </div>
+                            {bank.branch && bank.branch !== "N/A" && (
+                              <div>
+                                <p className="text-xs text-slate-500 font-semibold">Branch</p>
+                                <p className="text-slate-800">{bank.branch}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    {bankDetails.filter(bank => 
+                      (paymentMethod === "bank" && bank.type === "bank") ||
+                      (paymentMethod === "ezcash" && bank.type === "mobile")
+                    ).length === 0 && (
+                      <p className="text-red-500 text-center py-4">No payment details available</p>
+                    )}
+                  </div>
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      ⚠️ <strong>Important:</strong> Please transfer the exact amount and upload the payment slip below.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Payment Slip Upload */}
               <div>

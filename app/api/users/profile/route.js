@@ -65,22 +65,24 @@ export async function GET(request) {
       orders: orders.map(order => ({
         id: order._id,
         orderNumber: order.orderNumber,
-        gameName: order.gameName,
-        packageName: order.packageName,
-        packagePrice: order.packagePrice,
+        gameName: order.game || order.gameName || "Unknown Game",
+        packageName: order.package || order.packageName || "Unknown Package",
+        packagePrice: order.amount || order.packagePrice || "N/A",
         status: order.status,
         paymentMethod: order.paymentMethod,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
-        playerId: order.playerId,
+        playerId: order.gameId || order.playerId || "N/A",
+        playerNickname: order.playerNickname || "N/A",
+        quantity: order.quantity || 1,
       })),
       stats: {
         totalOrders: orders.length,
         pendingOrders: orders.filter(o => o.status === 'pending').length,
         completedOrders: orders.filter(o => o.status === 'completed').length,
         totalSpent: orders.filter(o => o.status === 'completed').reduce((sum, o) => {
-          const price = parseFloat(o.packagePrice?.replace(/[^0-9.-]+/g, "") || 0);
-          return sum + price;
+          const price = parseFloat((o.amount || o.packagePrice || "0").replace(/[^0-9.-]+/g, ""));
+          return sum + (isNaN(price) ? 0 : price);
         }, 0)
       }
     });
